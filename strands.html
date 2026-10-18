@@ -2,20 +2,340 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strands | Ryan & Erica</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wedding Strands | Ryan & Erica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'sans': ['Lato', 'sans-serif'],
+                    },
+                    colors: {
+                        'fall-cream': '#FCF9F5',
+                        'terracotta': '#E2725B',
+                        'terracotta-dark': '#C85A46',
+                        'fall-charcoal': '#43342E',
+                        'fall-sand': '#EEDFCE',
+                        'strands-green': '#6aaa64',
+                        'strands-yellow': '#f5a623',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F8F5F0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='#ebd9c8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            touch-action: none;
+        }
+
+        .letter-cell {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            text-transform: uppercase;
+            border: 2px solid #EEDFCE;
+            background-color: #ffffff;
+            color: #43342E;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.1s ease-in-out;
+            user-select: none;
+            touch-action: none;
+        }
+
+        @media (min-width: 640px) {
+            .letter-cell {
+                width: 52px;
+                height: 52px;
+                font-size: 1.5rem;
+            }
+        }
+
+        .letter-cell.selected {
+            background-color: #E2725B !important;
+            color: white !important;
+            border-color: #C85A46 !important;
+            transform: scale(1.08);
+        }
+
+        .letter-cell.found {
+            background-color: #6aaa64 !important;
+            color: white !important;
+            border-color: #6aaa64 !important;
+            cursor: default;
+        }
+
+        .letter-cell.spangram {
+            background-color: #f5a623 !important;
+            color: white !important;
+            border-color: #d48b19 !important;
+            cursor: default;
+        }
+
+        #toast {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-20px);
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <a href="index.html" class="nav-back">Back to Hub</a>
-        <div class="game-header">
-            <h1>Strands</h1>
-            <p>Connect letters to form hidden words.</p>
+<body class="min-h-screen font-sans text-fall-charcoal flex flex-col items-center p-4">
+
+    <!-- Navigation -->
+    <nav class="w-full max-w-5xl mx-auto flex justify-between items-center mb-4">
+        <a href="index.html" class="text-terracotta hover:text-terracotta-dark flex items-center gap-2 font-bold uppercase tracking-wider text-xs sm:text-sm transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to Hub
+        </a>
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Wedding Strands</span>
         </div>
-        <div style="margin: 3rem auto; padding: 4rem; border: 2px dashed var(--terracotta); border-radius: 12px; max-width: 450px; text-align: center; background: white;">
-            <p style="color: var(--text-light); text-transform: uppercase; letter-spacing: 1px;"><em>Grid component placeholder...</em></p>
+    </nav>
+
+    <!-- Header -->
+    <header class="text-center w-full max-w-2xl mx-auto mb-4">
+        <h1 class="text-3xl sm:text-4xl font-serif text-fall-charcoal mb-1 font-semibold">Wedding Strands</h1>
+        <p class="text-gray-600 font-sans text-sm italic" id="theme-clue">Theme: "Tying the knot & our favorite things"</p>
+        <div class="h-[1px] w-12 bg-terracotta mx-auto mt-2"></div>
+    </header>
+
+    <!-- Toast Notification -->
+    <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
+        <div id="toast" class="bg-fall-charcoal text-white px-6 py-3 rounded-full font-bold text-sm tracking-wide shadow-xl flex items-center gap-2">
+            <span id="toastMessage">Great job!</span>
         </div>
     </div>
+
+    <main class="w-full max-w-lg mx-auto flex flex-col items-center pb-8">
+        
+        <!-- Found Words List -->
+        <div class="w-full bg-white rounded-2xl p-4 mb-4 border border-fall-sand shadow-sm">
+            <div class="text-xs uppercase tracking-widest font-bold text-gray-400 mb-2 text-center">Theme Words Found</div>
+            <div id="found-words" class="flex flex-wrap justify-center gap-2">
+                <span class="text-sm italic text-gray-400">None yet. Drag across adjacent letters!</span>
+            </div>
+        </div>
+
+        <!-- Grid (6 cols x 8 rows) -->
+        <div id="grid" class="grid grid-cols-6 gap-2 sm:gap-2.5 p-3 bg-white rounded-3xl border border-fall-sand shadow-sm mb-6 select-none">
+            <!-- Grid cells injected by JS -->
+        </div>
+
+        <!-- Controls -->
+        <div class="flex gap-3 w-full max-w-xs">
+            <button id="clearBtn" class="flex-1 py-3 rounded-full border border-terracotta text-terracotta font-bold uppercase tracking-wider text-xs hover:bg-fall-cream transition-colors">
+                Clear Selection
+            </button>
+            <button id="submitBtn" class="flex-1 py-3 rounded-full bg-terracotta text-white font-bold uppercase tracking-wider text-xs hover:bg-terracotta-dark transition-colors shadow-md">
+                Submit Word
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        // Exactly 6 columns by 8 rows grid (48 letters total)
+        const GRID_LETTERS = [
+            ['T', 'U', 'F', 'T', 'S', 'X'],
+            ['B', 'R', 'I', 'D', 'E', 'Y'],
+            ['V', 'O', 'W', 'S', 'A', 'Z'],
+            ['A', 'L', 'T', 'A', 'R', 'B'],
+            ['A', 'V', 'E', 'N', 'U', 'E'],
+            ['R', 'O', 'M', 'A', 'N', 'C'],
+            ['Q', 'W', 'E', 'R', 'T', 'E'],
+            ['B', 'R', 'A', 'V', 'E', 'S']
+        ];
+
+        const VALID_WORDS = {
+            "TUFTS": { type: "word", display: "TUFTS" },
+            "BRIDE": { type: "word", display: "BRIDE" },
+            "VOWS": { type: "word", display: "VOWS" },
+            "ALTAR": { type: "word", display: "ALTAR" },
+            "AVENUE": { type: "word", display: "AVENUE" },
+            "ROMANCE": { type: "word", display: "ROMANCE" },
+            "BRAVES": { type: "spangram", display: "BRAVES FANDOM" }
+        };
+
+        let selectedCells = [];
+        let foundWords = [];
+        let foundCellCoords = new Set();
+        let isDragging = false;
+
+        const gridEl = document.getElementById('grid');
+        const foundWordsEl = document.getElementById('found-words');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+
+        function initGrid() {
+            gridEl.innerHTML = '';
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 6; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'letter-cell';
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.textContent = GRID_LETTERS[r][c];
+                    gridEl.appendChild(cell);
+                }
+            }
+
+            gridEl.addEventListener('pointerdown', handlePointerDown);
+            window.addEventListener('pointermove', handlePointerMove);
+            window.addEventListener('pointerup', handlePointerUp);
+        }
+
+        function getCellFromPoint(clientX, clientY) {
+            const el = document.elementFromPoint(clientX, clientY);
+            if (el && el.classList.contains('letter-cell')) {
+                return {
+                    r: parseInt(el.dataset.row),
+                    c: parseInt(el.dataset.col),
+                    cellEl: el
+                };
+            }
+            return null;
+        }
+
+        function handlePointerDown(e) {
+            const targetInfo = getCellFromPoint(e.clientX, e.clientY);
+            if (!targetInfo) return;
+
+            const { r, c, cellEl } = targetInfo;
+            if (cellEl.classList.contains('found') || cellEl.classList.contains('spangram')) return;
+
+            isDragging = true;
+            selectedCells = [{ r, c, letter: GRID_LETTERS[r][c] }];
+            updateSelectionUI();
+        }
+
+        function handlePointerMove(e) {
+            if (!isDragging) return;
+
+            const targetInfo = getCellFromPoint(e.clientX, e.clientY);
+            if (!targetInfo) return;
+
+            const { r, c, cellEl } = targetInfo;
+            if (cellEl.classList.contains('found') || cellEl.classList.contains('spangram')) return;
+
+            // Allow backtracking
+            const existingIndex = selectedCells.findIndex(item => item.r === r && item.c === c);
+            if (existingIndex !== -1) {
+                selectedCells = selectedCells.slice(0, existingIndex + 1);
+                updateSelectionUI();
+                return;
+            }
+
+            // Check adjacency to last selected cell
+            const last = selectedCells[selectedCells.length - 1];
+            const rowDiff = Math.abs(last.r - r);
+            const colDiff = Math.abs(last.c - c);
+
+            if (rowDiff <= 1 && colDiff <= 1) {
+                if (!selectedCells.some(item => item.r === r && item.c === c)) {
+                    selectedCells.push({ r, c, letter: GRID_LETTERS[r][c] });
+                    updateSelectionUI();
+                }
+            }
+        }
+
+        function handlePointerUp() {
+            isDragging = false;
+        }
+
+        function updateSelectionUI() {
+            document.querySelectorAll('.letter-cell').forEach(cell => {
+                const r = parseInt(cell.dataset.row);
+                const c = parseInt(cell.dataset.col);
+                const coordKey = `${r},${c}`;
+                
+                if (!foundCellCoords.has(coordKey)) {
+                    cell.classList.remove('selected');
+                }
+            });
+
+            selectedCells.forEach(item => {
+                const cell = document.querySelector(`[data-row="${item.r}"][data-col="${item.c}"]`);
+                if (cell) cell.classList.add('selected');
+            });
+        }
+
+        function showToast(message, duration = 2000) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        clearBtn.addEventListener('click', () => {
+            selectedCells = [];
+            updateSelectionUI();
+        });
+
+        submitBtn.addEventListener('click', () => {
+            if (selectedCells.length === 0) return;
+
+            const wordStr = selectedCells.map(i => i.letter).join('');
+
+            if (VALID_WORDS[wordStr] && !foundWords.includes(wordStr)) {
+                foundWords.push(wordStr);
+                const info = VALID_WORDS[wordStr];
+                
+                selectedCells.forEach(item => {
+                    const coordKey = `${item.r},${item.c}`;
+                    foundCellCoords.add(coordKey);
+                    const cell = document.querySelector(`[data-row="${item.r}"][data-col="${item.c}"]`);
+                    cell.classList.remove('selected');
+                    cell.classList.add(info.type === 'spangram' ? 'spangram' : 'found');
+                });
+
+                showToast(info.type === 'spangram' ? `Spangram Found: ${info.display}! ⭐` : `Found: ${info.display}! 🎉`);
+                renderFoundWords();
+                selectedCells = [];
+
+            } else {
+                showToast("Not a valid theme word. Try again!");
+                selectedCells = [];
+                updateSelectionUI();
+            }
+        });
+
+        function renderFoundWords() {
+            if (foundWords.length === 0) {
+                foundWordsEl.innerHTML = '<span class="text-sm italic text-gray-400">None yet. Drag across adjacent letters!</span>';
+                return;
+            }
+
+            foundWordsEl.innerHTML = '';
+            foundWords.forEach(w => {
+                const badge = document.createElement('span');
+                const info = VALID_WORDS[w];
+                badge.className = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${info.type === 'spangram' ? 'bg-fall-charcoal text-white' : 'bg-terracotta text-white'}`;
+                badge.textContent = info.display;
+                foundWordsEl.appendChild(badge);
+            });
+        }
+
+        initGrid();
+    </script>
 </body>
 </html>

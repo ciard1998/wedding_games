@@ -96,6 +96,14 @@
         
         <!-- View 1: Voting Grid -->
         <div id="voting-view" class="w-full animate-fade-in">
+            
+            <!-- Guest Name Input Section -->
+            <div class="max-w-md mx-auto mb-6 bg-white p-4 sm:p-5 rounded-2xl border border-fall-sand shadow-sm text-center">
+                <label for="guestName" class="block text-xs uppercase tracking-widest font-bold text-fall-charcoal mb-2">Your Name / Family Name</label>
+                <input type="text" id="guestName" placeholder="e.g. The Ciardiello Family" class="w-full px-4 py-3 rounded-xl border border-fall-sand focus:outline-none focus:border-terracotta text-fall-charcoal text-center font-serif text-lg bg-fall-cream/50" autocomplete="name">
+                <p id="nameError" class="text-[11px] text-terracotta mt-1 hidden">Please enter your name before selecting a song!</p>
+            </div>
+
             <div id="song-grid" class="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4 mb-8">
                 <!-- Song cards injected by JS -->
             </div>
@@ -111,12 +119,23 @@
         <div id="leaderboard-view" class="w-full max-w-3xl hidden">
             <div class="bg-white rounded-3xl p-6 sm:p-8 border border-fall-sand shadow-sm">
                 <div class="flex justify-between items-end mb-6">
-                    <h2 class="text-2xl font-serif font-bold text-fall-charcoal">Live Results</h2>
+                    <div>
+                        <h2 class="text-2xl font-serif font-bold text-fall-charcoal">Live Results</h2>
+                        <p class="text-xs text-gray-500 mt-0.5" id="user-guess-display">Your guess: None</p>
+                    </div>
                     <span class="text-sm font-bold uppercase tracking-widest text-terracotta" id="total-votes">0 Votes Cast</span>
                 </div>
                 
-                <div id="leaderboard-list" class="space-y-4">
+                <div id="leaderboard-list" class="space-y-4 mb-6">
                     <!-- Leaderboard rows injected by JS -->
+                </div>
+
+                <!-- Change Vote Button Container -->
+                <div id="change-vote-container" class="text-center pt-4 border-t border-fall-sand hidden">
+                    <button id="changeVoteBtn" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-terracotta hover:text-terracotta-dark transition-colors underline underline-offset-4">
+                        Change My Vote
+                    </button>
+                    <p class="text-[11px] text-gray-400 mt-1">Changes allowed until October 30, 2026 at 6:00 PM</p>
                 </div>
             </div>
             
@@ -128,44 +147,47 @@
     </main>
 
     <script>
-        // 25 Songs with realistic baseline votes
         const songs = [
-            { id: 1, title: "Lover", artist: "Taylor Swift", baseVotes: 42 },
-            { id: 2, title: "Us", artist: "James Bay", baseVotes: 28 },
-            { id: 3, title: "Beyond", artist: "Leon Bridges", baseVotes: 35 },
-            { id: 4, title: "Perfect", artist: "Ed Sheeran", baseVotes: 31 },
-            { id: 5, title: "You Are In Love", artist: "Taylor Swift", baseVotes: 24 },
-            { id: 6, title: "Can't Help Falling in Love", artist: "Elvis Presley", baseVotes: 20 },
-            { id: 7, title: "Wild Love", artist: "James Bay", baseVotes: 18 },
-            { id: 8, title: "Make You Feel My Love", artist: "Adele", baseVotes: 22 },
-            { id: 9, title: "All of Me", artist: "John Legend", baseVotes: 27 },
-            { id: 10, title: "A Thousand Years", artist: "Christina Perri", baseVotes: 19 },
-            { id: 11, title: "Invisible String", artist: "Taylor Swift", baseVotes: 15 },
-            { id: 12, title: "Stand By Me", artist: "Ben E. King", baseVotes: 14 },
-            { id: 13, title: "Better Together", artist: "Jack Johnson", baseVotes: 33 },
-            { id: 14, title: "Your Song", artist: "Elton John", baseVotes: 16 },
-            { id: 15, title: "Just the Way You Are", artist: "Bruno Mars", baseVotes: 12 },
-            { id: 16, title: "Speechless", artist: "Dan + Shay", baseVotes: 21 },
-            { id: 17, title: "Looking Out for You", artist: "Two Friends", baseVotes: 11 },
-            { id: 18, title: "First Day of My Life", artist: "Bright Eyes", baseVotes: 9 },
-            { id: 19, title: "In My Life", artist: "The Beatles", baseVotes: 26 },
-            { id: 20, title: "Fly Me to the Moon", artist: "Frank Sinatra", baseVotes: 17 },
-            { id: 21, title: "At Last", artist: "Etta James", baseVotes: 23 },
-            { id: 22, title: "Let's Stay Together", artist: "Al Green", baseVotes: 13 },
-            { id: 23, title: "Yellow", artist: "Coldplay", baseVotes: 10 },
-            { id: 24, title: "L-O-V-E", artist: "Nat King Cole", baseVotes: 8 },
-            { id: 25, title: "Thinking Out Loud", artist: "Ed Sheeran", baseVotes: 29 }
+            { id: 17, title: "(I Do) Like We Do", artist: "Harry Connick Jr." },
+            { id: 13, title: "Amazed", artist: "Lonestar" },
+            { id: 10, title: "You Are the Best Thing", artist: "Ray LaMontagne" },
+            { id: 20, title: "It Had to Be You", artist: "Frank Sinatra" },
+            { id: 19, title: "Marry Me", artist: "Train" },
+            { id: 7, title: "All Your'n", artist: "Tyler Childers" },
+            { id: 6, title: "In Case You Didn't Know", artist: "Brett Young" },
+            { id: 11, title: "Open Arms", artist: "Journey" },
+            { id: 16, title: "Lover", artist: "Taylor Swift" },
+            { id: 22, title: "I Don't Want to Miss a Thing", artist: "Aerosmith" },
+            { id: 12, title: "Back At One", artist: "Brian McKnight" },
+            { id: 18, title: "Forever After All", artist: "Luke Combs" },
+            { id: 2, title: "Not Even the King", artist: "Alicia Keys" },
+            { id: 15, title: "I Was Made for Loving You", artist: "Tori Kelly" },
+            { id: 23, title: "Lucky", artist: "Jason Mraz & Colbie Caillat" },
+            { id: 14, title: "I'll Be There (Acoustic)", artist: "Jess Glynne" },
+            { id: 3, title: "Say You Won't Let Go", artist: "James Arthur" },
+            { id: 24, title: "Perfect", artist: "Ed Sheeran" },
+            { id: 5, title: "Lifetime", artist: "Justin Bieber" },
+            { id: 25, title: "Can’t Take My Eyes Off You", artist: "Frankie Valli" },
+            { id: 8, title: "Good Thing Go", artist: "Quinn XCII" },
+            { id: 9, title: "Wonderful Tonight", artist: "Eric Clapton" },
+            { id: 1, title: "One Life", artist: "James Bay" },
+            { id: 4, title: "Made for You", artist: "Jake Owen" },
+            { id: 21, title: "Better Together", artist: "Jack Johnson" }
         ];
 
-        // ==========================================
-        // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
-        // ==========================================
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXRyQl0t0dBYqknA7IuyzmrV9uJzOfxgRatASyE1B-saHyM6BkUPjK-6Gdf8LJyVOLVg/exec";
-        // ==========================================
+        const CUTOFF_DATE = new Date("2026-10-30T18:00:00");
 
         let selectedSongId = null;
         let hasVoted = false;
-        let remoteVotes = {}; // Stores live vote counts fetched from Google Sheets
+        let remoteVotes = {};
+
+        // Generate or retrieve persistent unique voter ID
+        let guestUniqueId = localStorage.getItem('ryan_erica_voter_id');
+        if (!guestUniqueId) {
+            guestUniqueId = 'voter_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+            localStorage.setItem('ryan_erica_voter_id', guestUniqueId);
+        }
 
         const gridEl = document.getElementById('song-grid');
         const submitBtn = document.getElementById('submitBtn');
@@ -174,23 +196,34 @@
         const leaderboardList = document.getElementById('leaderboard-list');
         const subtitle = document.getElementById('subtitle');
         const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
         const totalVotesEl = document.getElementById('total-votes');
         const connectionStatus = document.getElementById('connection-status');
+        const changeVoteContainer = document.getElementById('change-vote-container');
+        const changeVoteBtn = document.getElementById('changeVoteBtn');
+        const guestNameInput = document.getElementById('guestName');
+        const nameError = document.getElementById('nameError');
+        const userGuessDisplay = document.getElementById('user-guess-display');
 
         async function init() {
             const savedPick = localStorage.getItem('ryan_erica_first_dance_pick');
+            const savedName = localStorage.getItem('ryan_erica_guest_name');
+            
+            if (savedName) {
+                guestNameInput.value = savedName;
+            }
+
             if (savedPick) {
                 hasVoted = true;
                 selectedSongId = parseInt(savedPick);
-                votingView.classList.add('hidden');
-                leaderboardView.classList.remove('hidden');
-                subtitle.textContent = "The current standings for our first dance.";
             }
 
-            // Fetch live votes from Google Sheet
             await fetchVotesFromSheet();
 
             if (hasVoted) {
+                votingView.classList.add('hidden');
+                leaderboardView.classList.remove('hidden');
+                subtitle.textContent = "The current standings for our first dance.";
                 renderLeaderboard();
             } else {
                 renderGrid();
@@ -198,16 +231,11 @@
         }
 
         async function fetchVotesFromSheet() {
-            if (GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
-                connectionStatus.textContent = "Demo Mode";
-                return;
-            }
-
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await response.json();
                 if (data && data.votes) {
-                    remoteVotes = data.votes; // Expected format: { "1": 5, "2": 3, ... }
+                    remoteVotes = data.votes;
                 }
                 connectionStatus.textContent = "Live Poll";
             } catch (err) {
@@ -218,15 +246,14 @@
 
         function getComputedSongs() {
             return songs.map(song => {
-                const sheetExtraVotes = remoteVotes[song.id] || 0;
-                // If user just voted on this device and it's not yet synced/fetched, add +1 locally
+                const sheetExtraVotes = remoteVotes[song.id] || remoteVotes[song.title] || 0;
                 let localExtra = 0;
-                if (hasVoted && song.id === selectedSongId && !remoteVotes[song.id]) {
+                if (hasVoted && song.id === selectedSongId && !remoteVotes[song.id] && !remoteVotes[song.title]) {
                     localExtra = 1;
                 }
                 return {
                     ...song,
-                    totalVotes: song.baseVotes + sheetExtraVotes + localExtra
+                    totalVotes: sheetExtraVotes + localExtra
                 };
             });
         }
@@ -255,19 +282,32 @@
                 `;
 
                 card.addEventListener('click', () => {
-                    if(!hasVoted) {
-                        selectedSongId = song.id;
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = `Vote for "${song.title}"`;
-                        renderGrid();
+                    const nameVal = guestNameInput.value.trim();
+                    if (!nameVal) {
+                        nameError.classList.remove('hidden');
+                        guestNameInput.focus();
+                        return;
                     }
+                    nameError.classList.add('hidden');
+
+                    selectedSongId = song.id;
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = hasVoted ? `Update Vote to "${song.title}"` : `Vote for "${song.title}"`;
+                    renderGrid();
                 });
                 
                 gridEl.appendChild(card);
             });
         }
 
-        function showToast() {
+        guestNameInput.addEventListener('input', () => {
+            if (guestNameInput.value.trim()) {
+                nameError.classList.add('hidden');
+            }
+        });
+
+        function showToast(message) {
+            toastMessage.textContent = message;
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -275,11 +315,26 @@
         }
 
         submitBtn.addEventListener('click', async () => {
-            if (!selectedSongId || hasVoted) return;
+            const guestName = guestNameInput.value.trim();
+            if (!guestName || !selectedSongId) {
+                nameError.classList.remove('hidden');
+                return;
+            }
+
+            const selectedSongObj = songs.find(s => s.id === selectedSongId);
+            const songName = selectedSongObj ? selectedSongObj.title : "Unknown";
+
+            const previousPickId = localStorage.getItem('ryan_erica_first_dance_pick');
+            const prevSongObj = songs.find(s => s.id === (previousPickId ? parseInt(previousPickId) : null));
+            const previousSongName = prevSongObj ? prevSongObj.title : null;
+
+            const isChangingVote = previousPickId && parseInt(previousPickId) !== selectedSongId;
 
             hasVoted = true;
             localStorage.setItem('ryan_erica_first_dance_pick', selectedSongId.toString());
-            showToast();
+            localStorage.setItem('ryan_erica_guest_name', guestName);
+            
+            showToast(isChangingVote ? "Vote updated successfully!" : "Vote submitted successfully!");
 
             votingView.classList.add('hidden');
             leaderboardView.classList.remove('hidden');
@@ -287,21 +342,40 @@
             
             renderLeaderboard();
 
-            // Send vote to Google Sheet via Apps Script
-            if (!GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
-                try {
-                    await fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors', // Standard bypass for Google Apps Script CORS restrictions
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ songId: selectedSongId })
-                    });
-                } catch (err) {
-                    console.error("Failed to send vote to sheet:", err);
-                }
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        guestName: guestName,
+                        songName: songName,
+                        uniqueId: guestUniqueId,
+                        previousSongName: previousSongName,
+                        action: isChangingVote ? 'update' : 'vote'
+                    })
+                });
+            } catch (err) {
+                console.error("Failed to send vote to sheet:", err);
             }
+        });
+
+        changeVoteBtn.addEventListener('click', () => {
+            const now = new Date();
+            if (now > CUTOFF_DATE) {
+                showToast("Voting is now closed!");
+                changeVoteContainer.classList.add('hidden');
+                return;
+            }
+
+            leaderboardView.classList.add('hidden');
+            votingView.classList.remove('hidden');
+            subtitle.textContent = "Select your new choice for our first dance.";
+            submitBtn.textContent = "Update My Vote";
+            submitBtn.disabled = false;
+            renderGrid();
         });
 
         function renderLeaderboard() {
@@ -309,10 +383,21 @@
             
             const computedSongs = getComputedSongs();
             const sortedSongs = computedSongs.sort((a, b) => b.totalVotes - a.totalVotes);
-            const maxVotes = sortedSongs[0].totalVotes;
+            const maxVotes = sortedSongs[0].totalVotes || 1;
             const totalVotes = sortedSongs.reduce((acc, curr) => acc + curr.totalVotes, 0);
             
             totalVotesEl.textContent = `${totalVotes} Votes Cast`;
+
+            const userSong = songs.find(s => s.id === selectedSongId);
+            const savedName = localStorage.getItem('ryan_erica_guest_name') || 'Guest';
+            userGuessDisplay.textContent = `${savedName}'s pick: ${userSong ? userSong.title : 'None'}`;
+
+            const now = new Date();
+            if (now <= CUTOFF_DATE) {
+                changeVoteContainer.classList.remove('hidden');
+            } else {
+                changeVoteContainer.classList.add('hidden');
+            }
 
             sortedSongs.forEach((song, index) => {
                 const percentage = Math.max((song.totalVotes / maxVotes) * 100, 5); 
@@ -322,7 +407,7 @@
                 row.className = `relative flex items-center p-3 sm:p-4 rounded-xl border ${isUserPick ? 'border-terracotta bg-fall-cream' : 'border-fall-sand bg-white'} overflow-hidden`;
                 
                 row.innerHTML = `
-                    <div class="absolute left-0 top-0 bottom-0 bg-terracotta opacity-10 progress-bar" style="width: 0%">` + `</div>
+                    <div class="absolute left-0 top-0 bottom-0 bg-terracotta opacity-10 progress-bar" style="width: 0%"></div>
                     
                     <div class="relative z-10 flex items-center w-full gap-4">
                         <div class="flex-shrink-0 w-6 text-center font-bold text-gray-400">
@@ -353,3 +438,4 @@
         init();
     </script>
 </body>
+</html>

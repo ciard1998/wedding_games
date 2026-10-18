@@ -2,37 +2,364 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wordle | Ryan & Erica</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wedding Wordle | Ryan & Erica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'sans': ['Lato', 'sans-serif'],
+                    },
+                    colors: {
+                        'fall-cream': '#FCF9F5',
+                        'terracotta': '#E2725B',
+                        'terracotta-dark': '#C85A46',
+                        'fall-charcoal': '#43342E',
+                        'fall-sand': '#EEDFCE',
+                        'wordle-green': '#6aaa64',
+                        'wordle-yellow': '#c9b458',
+                        'wordle-gray': '#787c7e',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .wordle-grid { display: grid; grid-template-rows: repeat(6, 1fr); gap: 8px; width: fit-content; margin: 2rem auto; }
-        .wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .wordle-cell { width: 60px; height: 60px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; text-transform: uppercase; background: white; color: var(--text-dark); }
+        body {
+            background-color: #F8F5F0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='#ebd9c8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            touch-action: manipulation;
+        }
+
+        .tile {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            border: 2px solid #EEDFCE;
+            background-color: #ffffff;
+            color: #43342E;
+            transition: all 0.15s ease-in-out;
+            user-select: none;
+        }
+
+        @media (max-width: 400px) {
+            .tile {
+                width: 44px;
+                height: 44px;
+                font-size: 1.25rem;
+            }
+        }
+
+        .tile.filled {
+            border-color: #C85A46;
+            transform: scale(1.03);
+        }
+
+        .tile.correct {
+            background-color: #6aaa64 !important;
+            color: white !important;
+            border-color: #6aaa64 !important;
+        }
+
+        .tile.present {
+            background-color: #c9b458 !important;
+            color: white !important;
+            border-color: #c9b458 !important;
+        }
+
+        .tile.absent {
+            background-color: #787c7e !important;
+            color: white !important;
+            border-color: #787c7e !important;
+        }
+
+        .key {
+            font-weight: 700;
+            font-size: 0.85rem;
+            background-color: #EEDFCE;
+            color: #43342E;
+            border-radius: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.1s;
+        }
+
+        .key:active {
+            background-color: #d6c4b2;
+        }
+
+        #toast {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-20px);
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <a href="index.html" class="nav-back">Back to Hub</a>
-        <div class="game-header">
-            <h1>Wordle</h1>
-            <p>Good vibes and energy themes!</p>
+<body class="min-h-screen font-sans text-fall-charcoal flex flex-col items-center p-4">
+
+    <!-- Navigation -->
+    <nav class="w-full max-w-5xl mx-auto flex justify-between items-center mb-4">
+        <a href="index.html" class="text-terracotta hover:text-terracotta-dark flex items-center gap-2 font-bold uppercase tracking-wider text-xs sm:text-sm transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to Hub
+        </a>
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Wedding Wordle</span>
         </div>
-        <div class="wordle-grid" id="grid"></div>
-        <p style="text-align:center; margin-top:2rem; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">(Keyboard and core Wordle guess logic goes here)</p>
+    </nav>
+
+    <!-- Header -->
+    <header class="text-center w-full max-w-2xl mx-auto mb-4">
+        <h1 class="text-3xl sm:text-4xl font-serif text-fall-charcoal mb-1 font-semibold">Wedding Wordle</h1>
+        <p class="text-gray-600 font-sans text-sm">Guess the 5-letter wedding-themed word!</p>
+        <div class="h-[1px] w-12 bg-terracotta mx-auto mt-2"></div>
+    </header>
+
+    <!-- Toast Notification -->
+    <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50">
+        <div id="toast" class="bg-fall-charcoal text-white px-6 py-3 rounded-full font-bold text-sm tracking-wide shadow-xl flex items-center gap-2">
+            <span id="toastMessage">Great job!</span>
+        </div>
     </div>
+
+    <main class="w-full max-w-md mx-auto flex flex-col items-center pb-8 flex-grow justify-between">
+        
+        <!-- Board -->
+        <div id="board" class="grid grid-rows-6 gap-2 my-2">
+            <!-- Rows injected by JS -->
+        </div>
+
+        <!-- Keyboard -->
+        <div id="keyboard" class="w-full flex flex-col gap-1.5 mt-4">
+            <div class="flex justify-center gap-1 w-full">
+                <div data-key="Q" class="key flex-1 h-12 flex items-center justify-center">Q</div>
+                <div data-key="W" class="key flex-1 h-12 flex items-center justify-center">W</div>
+                <div data-key="E" class="key flex-1 h-12 flex items-center justify-center">E</div>
+                <div data-key="R" class="key flex-1 h-12 flex items-center justify-center">R</div>
+                <div data-key="T" class="key flex-1 h-12 flex items-center justify-center">T</div>
+                <div data-key="Y" class="key flex-1 h-12 flex items-center justify-center">Y</div>
+                <div data-key="U" class="key flex-1 h-12 flex items-center justify-center">U</div>
+                <div data-key="I" class="key flex-1 h-12 flex items-center justify-center">I</div>
+                <div data-key="O" class="key flex-1 h-12 flex items-center justify-center">O</div>
+                <div data-key="P" class="key flex-1 h-12 flex items-center justify-center">P</div>
+            </div>
+            <div class="flex justify-center gap-1 w-full px-4">
+                <div data-key="A" class="key flex-1 h-12 flex items-center justify-center">A</div>
+                <div data-key="S" class="key flex-1 h-12 flex items-center justify-center">S</div>
+                <div data-key="D" class="key flex-1 h-12 flex items-center justify-center">D</div>
+                <div data-key="F" class="key flex-1 h-12 flex items-center justify-center">F</div>
+                <div data-key="G" class="key flex-1 h-12 flex items-center justify-center">G</div>
+                <div data-key="H" class="key flex-1 h-12 flex items-center justify-center">H</div>
+                <div data-key="J" class="key flex-1 h-12 flex items-center justify-center">J</div>
+                <div data-key="K" class="key flex-1 h-12 flex items-center justify-center">K</div>
+                <div data-key="L" class="key flex-1 h-12 flex items-center justify-center">L</div>
+            </div>
+            <div class="flex justify-center gap-1 w-full">
+                <div data-key="ENTER" class="key flex-[1.5] h-12 flex items-center justify-center text-[10px] sm:text-xs">ENTER</div>
+                <div data-key="Z" class="key flex-1 h-12 flex items-center justify-center">Z</div>
+                <div data-key="X" class="key flex-1 h-12 flex items-center justify-center">X</div>
+                <div data-key="C" class="key flex-1 h-12 flex items-center justify-center">C</div>
+                <div data-key="V" class="key flex-1 h-12 flex items-center justify-center">V</div>
+                <div data-key="B" class="key flex-1 h-12 flex items-center justify-center">B</div>
+                <div data-key="N" class="key flex-1 h-12 flex items-center justify-center">N</div>
+                <div data-key="M" class="key flex-1 h-12 flex items-center justify-center">M</div>
+                <div data-key="BACK" class="key flex-[1.5] h-12 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z"></path></svg>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
     <script>
-        const grid = document.getElementById('grid');
-        for(let i=0; i<6; i++) {
-            const row = document.createElement('div');
-            row.className = 'wordle-row';
-            for(let j=0; j<5; j++) {
-                const cell = document.createElement('div');
-                cell.className = 'wordle-cell';
-                row.appendChild(cell);
+        // ==========================================
+        // EDITABLE TARGET WORD
+        // You can change this 5-letter word anytime!
+        // ==========================================
+        const TARGET_WORD = "BRIDE"; // Must be uppercase 5 letters
+        // ==========================================
+
+        const MAX_ROWS = 6;
+        const WORD_LENGTH = 5;
+
+        let currentRow = 0;
+        let currentTile = 0;
+        let guesses = Array(MAX_ROWS).fill('');
+        let gameOver = false;
+
+        const boardEl = document.getElementById('board');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+
+        function initBoard() {
+            boardEl.innerHTML = '';
+            for (let r = 0; r < MAX_ROWS; r++) {
+                const rowEl = document.createElement('div');
+                rowEl.className = 'grid grid-cols-5 gap-2';
+                for (let c = 0; c < WORD_LENGTH; c++) {
+                    const tileEl = document.createElement('div');
+                    tileEl.className = 'tile rounded-lg';
+                    tileEl.id = `tile-${r}-${c}`;
+                    rowEl.appendChild(tileEl);
+                }
+                boardEl.appendChild(rowEl);
             }
-            grid.appendChild(row);
         }
+
+        function showToast(message, duration = 2000) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        function handleKey(key) {
+            if (gameOver) return;
+
+            if (key === 'ENTER') {
+                if (guesses[currentRow].length < WORD_LENGTH) {
+                    showToast("Not enough letters");
+                    return;
+                }
+                submitGuess();
+            } else if (key === 'BACK') {
+                if (guesses[currentRow].length > 0) {
+                    guesses[currentRow] = guesses[currentRow].slice(0, -1);
+                    currentTile--;
+                    updateBoard();
+                }
+            } else {
+                if (guesses[currentRow].length < WORD_LENGTH && key.length === 1) {
+                    guesses[currentRow] += key;
+                    currentTile++;
+                    updateBoard();
+                }
+            }
+        }
+
+        function updateBoard() {
+            const currentGuess = guesses[currentRow];
+            for (let c = 0; c < WORD_LENGTH; c++) {
+                const tile = document.getElementById(`tile-${currentRow}-${c}`);
+                if (c < currentGuess.length) {
+                    tile.textContent = currentGuess[c];
+                    tile.classList.add('filled');
+                } else {
+                    tile.textContent = '';
+                    tile.classList.remove('filled');
+                }
+            }
+        }
+
+        function submitGuess() {
+            const guess = guesses[currentRow];
+            const target = TARGET_WORD;
+
+            if (guess === target) {
+                revealGuess(guess);
+                showToast("Congratulations! You guessed it! 🎉", 4000);
+                gameOver = true;
+                return;
+            }
+
+            revealGuess(guess);
+            currentRow++;
+            currentTile = 0;
+
+            if (currentRow === MAX_ROWS) {
+                showToast(`Game Over! The word was ${target}`, 5000);
+                gameOver = true;
+            }
+        }
+
+        function revealGuess(guess) {
+            const targetChars = TARGET_WORD.split('');
+            const guessChars = guess.split('');
+            const status = Array(WORD_LENGTH).fill('absent');
+
+            // Check greens
+            for (let i = 0; i < WORD_LENGTH; i++) {
+                if (guessChars[i] === targetChars[i]) {
+                    status[i] = 'correct';
+                    targetChars[i] = null;
+                    guessChars[i] = null;
+                }
+            }
+
+            // Check yellows
+            for (let i = 0; i < WORD_LENGTH; i++) {
+                if (guessChars[i] !== null) {
+                    const index = targetChars.indexOf(guessChars[i]);
+                    if (index !== -1) {
+                        status[i] = 'present';
+                        targetChars[index] = null;
+                    }
+                }
+            }
+
+            // Apply styles
+            for (let i = 0; i < WORD_LENGTH; i++) {
+                const tile = document.getElementById(`tile-${currentRow}-${i}`);
+                const letter = guess[i];
+                const keyEl = document.querySelector(`[data-key="${letter}"]`);
+
+                setTimeout(() => {
+                    tile.classList.add(status[i]);
+                    
+                    // Update keyboard color
+                    if (keyEl) {
+                        if (status[i] === 'correct') {
+                            keyEl.className = keyEl.className.replace(/bg-\w+-\w+|wordle-\w+/g, '') + ' bg-wordle-green text-white';
+                        } else if (status[i] === 'present' && !keyEl.classList.contains('bg-wordle-green')) {
+                            keyEl.className = keyEl.className.replace(/bg-\w+-\w+|wordle-\w+/g, '') + ' bg-wordle-yellow text-white';
+                        } else if (status[i] === 'absent' && !keyEl.classList.contains('bg-wordle-green') && !keyEl.classList.contains('bg-wordle-yellow')) {
+                            keyEl.className = keyEl.className.replace(/bg-\w+-\w+|wordle-\w+/g, '') + ' bg-wordle-gray text-white';
+                        }
+                    }
+                }, i * 200);
+            }
+        }
+
+        // Event listeners for physical keyboard
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleKey('ENTER');
+            } else if (e.key === 'Backspace') {
+                handleKey('BACK');
+            } else {
+                const key = e.key.toUpperCase();
+                if (/^[A-Z]$/.test(key)) {
+                    handleKey(key);
+                }
+            }
+        });
+
+        // Event listeners for virtual keyboard
+        document.querySelectorAll('.key').forEach(keyEl => {
+            keyEl.addEventListener('click', () => {
+                const key = keyEl.getAttribute('data-key');
+                handleKey(key);
+            });
+        });
+
+        initBoard();
     </script>
 </body>
 </html>
