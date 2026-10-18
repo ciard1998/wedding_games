@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryan & Erica's First Dance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'sans': ['Lato', 'sans-serif'],
+                    },
+                    colors: {
+                        'wedding-cream': '#FCFAF8',
+                        'wedding-gold': '#C5A880',
+                        'wedding-gold-dark': '#A3875D',
+                        'wedding-charcoal': '#4A4A4A',
+                        'wedding-sage': '#E3E7D3',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F7F5F0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='#e8e3d9' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .song-option input[type="radio"] {
+            display: none;
+        }
+
+        .song-option label {
+            display: block;
+            padding: 0.75rem 1rem;
+            border: 1px solid #E5E0D8;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: white;
+        }
+
+        .song-option input[type="radio"]:checked + label {
+            border-color: #C5A880;
+            background-color: #FCFAF8;
+            box-shadow: 0 0 0 1px #C5A880;
+        }
+
+        .song-option input[type="radio"]:checked + label .check-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .check-icon {
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s ease;
+        }
+        
+        /* Custom scrollbar for the list */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d4cfc7; 
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #C5A880; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 font-sans text-wedding-charcoal">
+
+    <div id="app-container" class="max-w-md w-full bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] overflow-hidden relative border border-[#f0ece1]">
+        <!-- Decorative Header -->
+        <div class="h-2 w-full bg-gradient-to-r from-wedding-sage via-wedding-gold to-wedding-sage opacity-70"></div>
+        
+        <div class="p-6 sm:p-8">
+            <div class="text-center mb-6">
+                <p class="text-xs uppercase tracking-[0.2em] text-wedding-gold-dark mb-2">Join the Celebration</p>
+                <h1 class="text-3xl sm:text-4xl font-serif text-wedding-charcoal mb-2">Ryan & Erica</h1>
+                <h2 class="text-xl font-serif italic text-gray-500">First Dance Guess</h2>
+                <div class="w-16 h-[1px] bg-wedding-gold mx-auto mt-4"></div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-view" class="py-12 text-center">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-wedding-gold"></div>
+                <p class="mt-4 text-sm text-gray-500">Preparing the stage...</p>
+            </div>
+
+            <!-- Form View -->
+            <div id="form-view" class="hidden">
+                <p class="text-center text-sm mb-6 text-gray-600">
+                    What song will we share our first dance to? <br> Cast your guess below!
+                </p>
+
+                <form id="guess-form" class="space-y-5">
+                    <div>
+                        <label for="guest-name" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                        <input type="text" id="guest-name" required placeholder="Jane & John Doe" 
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-wedding-gold focus:border-wedding-gold outline-none transition-colors bg-gray-50 focus:bg-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select a Song</label>
+                        <div id="songs-container" class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar pr-2 pb-2">
+                            <!-- Songs will be injected here by JS -->
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="w-full bg-wedding-gold hover:bg-wedding-gold-dark text-white font-serif tracking-wide py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2 mt-4 shadow-sm">
+                        <span>Submit Guess</span>
+                        <svg id="submit-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                    <p id="error-message" class="text-red-500 text-sm text-center hidden mt-2"></p>
+                </form>
+            </div>
+
+            <!-- Results View -->
+            <div id="results-view" class="hidden py-4">
+                <div class="text-center mb-6">
+                    <div class="w-12 h-12 bg-wedding-sage rounded-full flex items-center justify-center mx-auto mb-3 text-wedding-gold-dark shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-serif text-wedding-charcoal mb-2">Thank You!</h3>
+                    <p class="text-sm text-gray-600">Here is how the guesses are currently standing:</p>
+                </div>
+                <div id="leaderboard-container" class="space-y-4 max-h-80 overflow-y-auto custom-scrollbar pr-2 pb-2">
+                    <!-- Leaderboard will be injected here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const songs = [
+            "One Life - James Bay",
+            "Not Even the King - Alicia Keys",
+            "Say You Won't Let Go - James Arthur",
+            "Made for You - Jake Owen",
+            "Lifetime - Justin Bieber",
+            "In Case You Didn't Know - Brett Young",
+            "All Your'n - Tyler Childers",
+            "Good Thing Go - Quinn XCII",
+            "Wonderful Tonight - Eric Clapton",
+            "You Are the Best Thing - Ray LaMontagne",
+            "Open Arms - Journey",
+            "Back At One - Brian McKnight",
+            "Amazed - Lonestar",
+            "I'll Be There (Acoustic) - Jess Glynne",
+            "I Was Made for Loving You - Tori Kelly",
+            "Lover - Taylor Swift",
+            "(I Do) Like We Do - Harry Connick Jr.",
+            "Forever After All - Luke Combs",
+            "Marry Me - Train",
+            "It Had to Be You - Frank Sinatra",
+            "Better Together - Jack Johnson",
+            "I Don't Want to Miss a Thing - Aerosmith",
+            "Lucky - Jason Mraz & Colbie Caillat",
+            "Perfect - Ed Sheeran",
+            "Can’t Take My Eyes Off You - Frankie Valli"
+        ];
+
+        // Environment variables
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-wedding-app';
+        let firebaseConfig = null;
+        
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch (e) {
+            console.error("Error parsing firebase config", e);
+        }
+
+        // Initialize UI Elements
+        const loadingView = document.getElementById('loading-view');
+        const formView = document.getElementById('form-view');
+        const resultsView = document.getElementById('results-view');
+        const leaderboardContainer = document.getElementById('leaderboard-container');
+        const songsContainer = document.getElementById('songs-container');
+        const form = document.getElementById('guess-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitSpinner = document.getElementById('submit-spinner');
+        const errorMsg = document.getElementById('error-message');
+
+        // Populate Songs
+        function renderSongs() {
+            songs.forEach((song, index) => {
+                const songHtml = `
+                    <div class="song-option relative">
+                        <input type="radio" id="song-${index}" name="songSelection" value="${song}" required>
+                        <label for="song-${index}" class="flex items-center justify-between group">
+                            <span class="text-sm font-medium text-gray-800 pr-8 leading-snug group-hover:text-wedding-gold-dark transition-colors">${song}</span>
+                            <div class="absolute right-4 text-wedding-gold check-icon">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                        </label>
+                    </div>
+                `;
+                songsContainer.insertAdjacentHTML('beforeend', songHtml);
+            });
+        }
+
+        // Main App Logic
+        async function initApp() {
+            renderSongs();
+
+            if (!firebaseConfig) {
+                // Standalone mode if no firebase config provided
+                loadingView.classList.add('hidden');
+                formView.classList.remove('hidden');
+                setupForm(null, null);
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+
+                // Authenticate
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Setup form handling
+                setupForm(db, auth);
+
+                loadingView.classList.add('hidden');
+                formView.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                errorMsg.textContent = "Unable to connect. Please try again later.";
+                errorMsg.classList.remove('hidden');
+                loadingView.classList.add('hidden');
+            }
+        }
+
+        function setupForm(db, auth) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const guestName = document.getElementById('guest-name').value.trim();
+                const selectedSong = document.querySelector('input[name="songSelection"]:checked').value;
+
+                if (!guestName || !selectedSong) return;
+
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                submitSpinner.classList.remove('hidden');
+                errorMsg.classList.add('hidden');
+
+                try {
+                    if (db && auth && auth.currentUser) {
+                        // Save to Firebase using strict path rules
+                        const guessesRef = collection(db, 'artifacts', appId, 'public', 'data', 'first_dance_guesses');
+                        await addDoc(guessesRef, {
+                            guestName: guestName,
+                            songGuess: selectedSong,
+                            timestamp: serverTimestamp(),
+                            userId: auth.currentUser.uid
+                        });
+                    } else {
+                        // Simulate network request for standalone mode
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        console.log("Standalone mode: Guess saved locally", { guestName, selectedSong });
+                        renderStandaloneLeaderboard(selectedSong);
+                    }
+
+                    // Show success UI
+                    formView.classList.add('hidden');
+                    resultsView.classList.remove('hidden');
+                    
+                    if (db) {
+                        listenToResults(db);
+                    }
+                    
+                } catch (error) {
+                    console.error("Error saving guess:", error);
+                    errorMsg.textContent = "Something went wrong. Please try again.";
+                    errorMsg.classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    submitSpinner.classList.add('hidden');
+                }
+            });
+        }
+
+        function listenToResults(db) {
+            const guessesRef = collection(db, 'artifacts', appId, 'public', 'data', 'first_dance_guesses');
+            onSnapshot(guessesRef, (snapshot) => {
+                const voteCounts = {};
+                let totalVotes = 0;
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.songGuess) {
+                        voteCounts[data.songGuess] = (voteCounts[data.songGuess] || 0) + 1;
+                        totalVotes++;
+                    }
+                });
+                
+                renderLeaderboard(voteCounts, totalVotes);
+            }, (error) => {
+                console.error("Error fetching live results:", error);
+            });
+        }
+
+        function renderLeaderboard(voteCounts, totalVotes) {
+            leaderboardContainer.innerHTML = '';
+            
+            if (totalVotes === 0) {
+                leaderboardContainer.innerHTML = '<p class="text-center text-sm text-gray-500 italic mt-4">No guesses yet. You are the first!</p>';
+                return;
+            }
+
+            // Convert to array and sort descending by count
+            const sortedVotes = Object.entries(voteCounts).sort((a, b) => b[1] - a[1]);
+
+            sortedVotes.forEach(([song, count]) => {
+                const percentage = Math.round((count / totalVotes) * 100);
+                const isTop = count === sortedVotes[0][1]; // Highlights the leader(s)
+                
+                const barHtml = `
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-1.5 items-end">
+                            <span class="font-medium truncate pr-2 flex-1 ${isTop ? 'text-wedding-gold-dark' : 'text-gray-700'}">${song}</span>
+                            <span class="text-xs text-gray-500 font-medium whitespace-nowrap">${count} ${count === 1 ? 'vote' : 'votes'} (${percentage}%)</span>
+                        </div>
+                        <div class="w-full bg-[#f0ece1] rounded-full h-2">
+                            <div class="bg-wedding-gold h-2 rounded-full transition-all duration-1000 ease-out" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+                leaderboardContainer.insertAdjacentHTML('beforeend', barHtml);
+            });
+        }
+
+        function renderStandaloneLeaderboard(selectedSong) {
+             const mockVotes = {
+                 [selectedSong]: 1
+             };
+             renderLeaderboard(mockVotes, 1);
+        }
+
+        // Boot
+        initApp();
+
+    </script>
+</body>
+</html>
