@@ -3,38 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ryan & Erica's Wedding Games</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Ryan & Erica's Wedding Games Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'sans': ['Lato', 'sans-serif'],
+                    },
+                    colors: {
+                        'fall-cream': '#FCF9F5',
+                        'terracotta': '#E2725B',
+                        'terracotta-dark': '#C85A46',
+                        'fall-charcoal': '#43342E',
+                        'fall-sand': '#EEDFCE',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F8F5F0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='#ebd9c8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .card-hover:hover .icon-bg {
+            background-color: #FCF9F5;
+            color: #C85A46;
+            border-color: #E2725B;
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>Ryan & Erica</h1>
-        <p style="font-style: italic; margin-top: 0.5rem; color: var(--terracotta);">October 29, 2026</p>
-        <p style="margin-top: 1rem; font-size: 1.2rem;">Welcome to the Wedding Games Hub!</p>
+<body class="min-h-screen font-sans text-fall-charcoal flex flex-col items-center p-4 sm:p-8">
+
+    <!-- Header Section -->
+    <header class="text-center w-full max-w-4xl mx-auto mt-12 mb-16">
+        <div class="inline-block px-4 py-1 mb-6 border border-terracotta rounded-full bg-white/50 backdrop-blur-sm">
+            <p class="text-xs sm:text-sm uppercase tracking-[0.3em] text-terracotta-dark font-bold">October 30, 2026</p>
+        </div>
+        <h1 class="text-5xl sm:text-6xl md:text-7xl font-serif text-fall-charcoal mb-6 tracking-tight font-semibold">Ryan & Erica</h1>
+        <h2 class="text-2xl sm:text-3xl font-serif italic text-gray-600 mb-8">Digital Wedding Games Hub</h2>
+        
+        <div class="flex items-center justify-center max-w-xs mx-auto">
+            <div class="h-[1px] bg-fall-sand flex-1"></div>
+            <svg class="w-5 h-5 mx-4 text-terracotta opacity-80" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <div class="h-[1px] bg-fall-sand flex-1"></div>
+        </div>
+        
+        <p class="mt-8 text-lg sm:text-xl text-gray-600 font-sans max-w-2xl mx-auto leading-relaxed">
+            Welcome to our interactive celebration! Join the fun, test your knowledge, and cast your guesses as we count down to our special day.
+        </p>
     </header>
-    <main class="container">
-        <div class="grid">
-            <a href="first-dance.html" class="card">
-                <h2>First Dance Sweepstakes</h2>
-                <p>Guess our first dance song and see the live leaderboard.</p>
-            </a>
-            <a href="connections.html" class="card">
-                <h2>Connections</h2>
-                <p>Group the 16 words into 4 categories of 4.</p>
-            </a>
-            <a href="wordle.html" class="card">
-                <h2>Wordle</h2>
-                <p>Guess the 5-letter wedding word of the day.</p>
-            </a>
-            <a href="strands.html" class="card">
-                <h2>Strands</h2>
-                <p>Find the hidden words in the grid.</p>
-            </a>
-            <a href="dailytens.html" class="card">
-                <h2>DailyTens</h2>
-                <p>Can you guess the top ten list?</p>
-            </a>
+
+    <!-- Games Grid -->
+    <main class="w-full max-w-6xl mx-auto pb-20">
+        <!-- Using flex layout to naturally center the 5 items (3 on top, 2 on bottom on large screens) -->
+        <div class="flex flex-wrap justify-center gap-6 sm:gap-8">
+
+            <!-- Connections Card -->
+            <div class="card-hover w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-8 border border-fall-sand shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-fall-sand to-fall-sand group-hover:from-terracotta group-hover:to-terracotta-dark transition-all duration-300"></div>
+                
+                <div class="icon-bg w-14 h-14 rounded-2xl bg-fall-cream border border-fall-sand flex items-center justify-center text-terracotta mb-6 transition-colors duration-300">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path>
+                    </svg>
+                </div>
+                
+                <h3 class="text-2xl font-serif font-bold text-fall-charcoal mb-3">Connections</h3>
+                <p class="text-gray-500 mb-8 flex-grow leading-relaxed">Find the hidden links. Group our special wedding-themed words into categories of four.</p>
+                
+                <a href="connections.html" class="inline-flex items-center justify-center w-full bg-fall-cream border border-terracotta text-terracotta-dark font-bold tracking-widest uppercase text-sm py-3 px-4 rounded-xl group-hover:bg-terracotta group-hover:text-white transition-all duration-300">
+                    Play Now
+                </a>
+            </div>
+
+            <!-- Wordle Card -->
+            <div class="card-hover w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-8 border border-fall-sand shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-fall-sand to-fall-sand group-hover:from-terracotta group-hover:to-terracotta-dark transition-all duration-300"></div>
+                
+                <div class="icon-bg w-14 h-14 rounded-2xl bg-fall-cream border border-fall-sand flex items-center justify-center text-terracotta mb-6 transition-colors duration-300">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16M8 4v16M16 4v16"></path>
+                    </svg>
+                </div>
+                
+                <h3 class="text-2xl font-serif font-bold text-fall-charcoal mb-3">Wordle</h3>
+                <p class="text-gray-500 mb-8 flex-grow leading-relaxed">Can you guess the secret 5-letter wedding word? You have six tries to figure it out!</p>
+                
+                <a href="wordle.html" class="inline-flex items-center justify-center w-full bg-fall-cream border border-terracotta text-terracotta-dark font-bold tracking-widest uppercase text-sm py-3 px-4 rounded-xl group-hover:bg-terracotta group-hover:text-white transition-all duration-300">
+                    Play Now
+                </a>
+            </div>
+
+            <!-- Strands Card -->
+            <div class="card-hover w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-8 border border-fall-sand shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-fall-sand to-fall-sand group-hover:from-terracotta group-hover:to-terracotta-dark transition-all duration-300"></div>
+                
+                <div class="icon-bg w-14 h-14 rounded-2xl bg-fall-cream border border-fall-sand flex items-center justify-center text-terracotta mb-6 transition-colors duration-300">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                
+                <h3 class="text-2xl font-serif font-bold text-fall-charcoal mb-3">Strands</h3>
+                <p class="text-gray-500 mb-8 flex-grow leading-relaxed">Hunt for clues and connect the letters to find the hidden wedding words in the puzzle grid.</p>
+                
+                <a href="strands.html" class="inline-flex items-center justify-center w-full bg-fall-cream border border-terracotta text-terracotta-dark font-bold tracking-widest uppercase text-sm py-3 px-4 rounded-xl group-hover:bg-terracotta group-hover:text-white transition-all duration-300">
+                    Play Now
+                </a>
+            </div>
+
+            <!-- DailyTens Card -->
+            <div class="card-hover w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-8 border border-fall-sand shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-fall-sand to-fall-sand group-hover:from-terracotta group-hover:to-terracotta-dark transition-all duration-300"></div>
+                
+                <div class="icon-bg w-14 h-14 rounded-2xl bg-fall-cream border border-fall-sand flex items-center justify-center text-terracotta mb-6 transition-colors duration-300">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                </div>
+                
+                <h3 class="text-2xl font-serif font-bold text-fall-charcoal mb-3">DailyTens</h3>
+                <p class="text-gray-500 mb-8 flex-grow leading-relaxed">Rank the top 10 lists related to the bride, groom, and everything wedding-related!</p>
+                
+                <a href="dailytens.html" class="inline-flex items-center justify-center w-full bg-fall-cream border border-terracotta text-terracotta-dark font-bold tracking-widest uppercase text-sm py-3 px-4 rounded-xl group-hover:bg-terracotta group-hover:text-white transition-all duration-300">
+                    Play Now
+                </a>
+            </div>
+
+            <!-- First Dance Sweepstakes Card -->
+            <div class="card-hover w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white rounded-3xl p-8 border border-terracotta shadow-[0_4px_20px_rgba(226,114,91,0.08)] hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full relative overflow-hidden group">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-terracotta to-terracotta-dark"></div>
+                
+                <div class="absolute -top-6 -right-6 text-fall-cream opacity-40 transform rotate-12 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                    <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </div>
+
+                <div class="icon-bg w-14 h-14 rounded-2xl bg-terracotta border border-terracotta-dark flex items-center justify-center text-white mb-6 relative z-10 transition-colors duration-300 group-hover:bg-terracotta-dark">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                    </svg>
+                </div>
+                
+                <div class="relative z-10 flex-grow">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="text-2xl font-serif font-bold text-fall-charcoal">Sweepstakes</h3>
+                        <span class="bg-terracotta/10 text-terracotta-dark text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-bold">Live</span>
+                    </div>
+                    <p class="text-gray-500 mb-8 leading-relaxed">Guess our first dance song and see the live votes unfold in real-time. What will we choose?</p>
+                </div>
+
+                <a href="sweepstakes.html" class="relative z-10 inline-flex items-center justify-center w-full bg-terracotta border border-terracotta text-white font-bold tracking-widest uppercase text-sm py-3 px-4 rounded-xl group-hover:bg-terracotta-dark transition-all duration-300 shadow-md">
+                    Cast Your Guess
+                </a>
+            </div>
+
         </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-8 text-gray-400 font-serif text-sm mt-auto border-t border-fall-sand/50">
+        <p>&copy; 2026 Ryan & Erica. We can't wait to celebrate with you.</p>
+    </footer>
+
 </body>
 </html>

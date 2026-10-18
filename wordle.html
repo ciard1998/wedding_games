@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding Wordle</title>
+    <title>Wordle | Ryan & Erica</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .wordle-grid { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; width: fit-content; margin: 2rem auto; }
-        .wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
-        .wordle-cell { width: 50px; height: 50px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; }
+        .wordle-grid { display: grid; grid-template-rows: repeat(6, 1fr); gap: 8px; width: fit-content; margin: 2rem auto; }
+        .wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .wordle-cell { width: 60px; height: 60px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; text-transform: uppercase; background: white; color: var(--text-dark); }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="index.html" class="nav-back">&larr; Back to Hub</a>
-        <h1>Wordle</h1>
-        <p style="text-align:center;">Good vibes and energy themes!</p>
+        <a href="index.html" class="nav-back">Back to Hub</a>
+        <div class="game-header">
+            <h1>Wordle</h1>
+            <p>Good vibes and energy themes!</p>
+        </div>
         <div class="wordle-grid" id="grid"></div>
-        <p style="text-align:center; margin-top:2rem; color:#666;">(Keyboard and core Wordle guess logic goes here)</p>
+        <p style="text-align:center; margin-top:2rem; color:var(--text-light); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">(Keyboard and core Wordle guess logic goes here)</p>
     </div>
     <script>
         const grid = document.getElementById('grid');
@@ -31,7 +33,6 @@
             }
             grid.appendChild(row);
         }
-        // e.g. targetWord = "VIBES";
     </script>
 </body>
 </html>

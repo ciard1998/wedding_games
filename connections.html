@@ -2,82 +2,393 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding Connections</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Connections | Ryan & Erica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'sans': ['Lato', 'sans-serif'],
+                    },
+                    colors: {
+                        'fall-cream': '#FCF9F5',
+                        'terracotta': '#E2725B',
+                        'terracotta-dark': '#C85A46',
+                        'fall-charcoal': '#43342E',
+                        'fall-sand': '#EEDFCE',
+                        // Solved category colors blending the theme
+                        'lvl-1': '#EEDFCE', // Sand
+                        'lvl-2': '#E8A598', // Soft warm terracotta
+                        'lvl-3': '#E2725B', // Terracotta
+                        'lvl-4': '#C85A46', // Dark Terracotta
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 2rem auto; max-width: 600px; }
-        .tile { background-color: #efefef; border-radius: 8px; padding: 1.5rem 0.5rem; text-align: center; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; user-select: none; transition: background-color 0.2s; }
-        .tile.selected { background-color: var(--text-dark); color: white; }
-        .controls { text-align: center; margin-top: 1rem; }
-        .message { text-align: center; margin: 1rem; font-weight: bold; color: var(--terracotta); min-height: 24px; }
+        body {
+            background-color: #F8F5F0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='#ebd9c8' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            touch-action: manipulation;
+        }
+
+        /* Prevent text selection on cards */
+        .card {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pop {
+            animation: pop 0.2s ease-in-out;
+        }
+
+        #toast {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-20px) translateX(-5px);
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translateY(0) translateX(-5px);
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <a href="index.html" class="nav-back">&larr; Back to Hub</a>
-        <h1>Connections</h1>
-        <p style="text-align:center;">Create four groups of four!</p>
-        <div class="message" id="msg"></div>
-        <div class="board" id="board"></div>
-        <div class="controls">
-            <button class="btn" onclick="shuffle()">Shuffle</button>
-            <button class="btn" onclick="submit()">Submit</button>
+<body class="min-h-screen font-sans text-fall-charcoal flex flex-col items-center p-4">
+
+    <!-- Navigation -->
+    <nav class="w-full max-w-2xl mx-auto flex justify-between items-center mb-6">
+        <a href="index.html" class="text-terracotta hover:text-terracotta-dark flex items-center gap-2 font-bold uppercase tracking-wider text-xs sm:text-sm transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to Hub
+        </a>
+    </nav>
+
+    <!-- Header -->
+    <header class="text-center w-full max-w-2xl mx-auto mb-8">
+        <h1 class="text-4xl sm:text-5xl font-serif text-fall-charcoal mb-2 font-semibold">Connections</h1>
+        <p class="text-gray-600 font-sans">Group words that share a common thread.</p>
+        <div class="h-[1px] w-16 bg-terracotta mx-auto mt-4"></div>
+    </header>
+
+    <!-- Toast Notification Container -->
+    <div class="relative w-full max-w-2xl flex justify-center mb-4 h-10">
+        <div id="toast" class="absolute bg-fall-charcoal text-white px-6 py-2 rounded-full font-bold text-sm tracking-wide shadow-lg z-50 flex items-center gap-2">
+            <span id="toastMessage">Message goes here</span>
         </div>
     </div>
 
-    <script>
-        const words = [
-            "AUCKLAND", "KAUAI", "MAUI", "SYDNEY", // Honeymoon
-            "OLD", "NEW", "BORROWED", "BLUE", // Wedding Tradition Traps
-            "TUFTS", "JUMBOS", "MEDFORD", "SOMERVILLE", // Alma Mater
-            "BRAVES", "ATLANTA", "TRUIST", "TOMAHAWK" // Baseball
-        ];
+    <!-- Game Board -->
+    <main class="w-full max-w-2xl mx-auto flex flex-col items-center">
         
-        let selected = [];
-        const board = document.getElementById('board');
+        <!-- Grid -->
+        <div id="grid" class="w-full grid grid-cols-4 gap-2 sm:gap-3 mb-8">
+            <!-- Cards will be injected here by JS -->
+        </div>
 
-        function render() {
-            board.innerHTML = '';
-            words.forEach(word => {
-                const el = document.createElement('div');
-                el.className = 'tile' + (selected.includes(word) ? ' selected' : '');
-                el.textContent = word;
-                el.onclick = () => toggle(word);
-                board.appendChild(el);
+        <!-- Mistakes Remaining -->
+        <div class="flex items-center gap-3 mb-8">
+            <span class="text-sm font-bold uppercase tracking-widest text-gray-500">Mistakes Remaining:</span>
+            <div id="mistakes" class="flex gap-2">
+                <div class="w-3 h-3 rounded-full bg-terracotta"></div>
+                <div class="w-3 h-3 rounded-full bg-terracotta"></div>
+                <div class="w-3 h-3 rounded-full bg-terracotta"></div>
+                <div class="w-3 h-3 rounded-full bg-terracotta"></div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
+            <button id="shuffleBtn" class="flex-1 sm:flex-none px-6 py-3 rounded-full border border-fall-charcoal text-fall-charcoal font-bold uppercase tracking-wider text-xs sm:text-sm hover:bg-fall-charcoal hover:text-white transition-colors">
+                Shuffle
+            </button>
+            <button id="deselectBtn" class="flex-1 sm:flex-none px-6 py-3 rounded-full border border-fall-charcoal text-fall-charcoal font-bold uppercase tracking-wider text-xs sm:text-sm hover:bg-fall-charcoal hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                Deselect All
+            </button>
+            <button id="submitBtn" class="flex-1 sm:flex-none px-6 py-3 rounded-full bg-terracotta text-white font-bold uppercase tracking-wider text-xs sm:text-sm hover:bg-terracotta-dark transition-colors border border-terracotta disabled:opacity-50 disabled:cursor-not-allowed shadow-md" disabled>
+                Submit
+            </button>
+        </div>
+
+    </main>
+
+    <script>
+        // Game Data Setup
+        const gameData = [
+            { id: 'traditions', title: 'WEDDING TRADITIONS', words: ['OLD', 'NEW', 'BORROWED', 'BLUE'], colorClass: 'bg-lvl-1 text-fall-charcoal' },
+            { id: 'honeymoon', title: 'HONEYMOON DESTINATIONS', words: ['AUCKLAND', 'KAUAI', 'MAUI', 'SYDNEY'], colorClass: 'bg-lvl-2 text-fall-charcoal' },
+            { id: 'tufts', title: 'TUFTS UNIVERSITY', words: ['JUMBO', 'MEDFORD', 'NESCAC', 'TISCH'], colorClass: 'bg-lvl-3 text-white' },
+            { id: 'braves', title: 'BRAVES BASEBALL', words: ['ATLANTA', 'TRUIST', 'TOMAHAWK', 'HOMER'], colorClass: 'bg-lvl-4 text-white' }
+        ];
+
+        // State Variables
+        let words = [];
+        let selectedWords = [];
+        let solvedCategories = [];
+        let mistakes = 4;
+        let pastGuesses = [];
+        let isGameOver = false;
+
+        // DOM Elements
+        const gridEl = document.getElementById('grid');
+        const mistakesEl = document.getElementById('mistakes');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const deselectBtn = document.getElementById('deselectBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const toastEl = document.getElementById('toast');
+        const toastMessageEl = document.getElementById('toastMessage');
+
+        // Initialization
+        function initGame() {
+            // Flatten words and shuffle
+            gameData.forEach(cat => {
+                cat.words.forEach(word => {
+                    words.push({ text: word, categoryId: cat.id });
+                });
             });
+            shuffleArray(words);
+            renderBoard();
         }
 
-        function toggle(word) {
-            if (selected.includes(word)) {
-                selected = selected.filter(w => w !== word);
-            } else if (selected.length < 4) {
-                selected.push(word);
-            }
-            render();
-        }
-
-        function shuffle() {
-            for (let i = words.length - 1; i > 0; i--) {
+        // Shuffle Utility
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [words[i], words[j]] = [words[j], words[i]];
+                [array[i], array[j]] = [array[j], array[i]];
             }
-            render();
         }
 
-        function submit() {
-            if (selected.length !== 4) {
-                document.getElementById('msg').textContent = "Select 4 items.";
-                setTimeout(() => document.getElementById('msg').textContent = "", 2000);
+        // Render Game Board
+        function renderBoard() {
+            gridEl.innerHTML = '';
+            
+            // 1. Render Solved Categories First
+            solvedCategories.forEach(cat => {
+                const catDiv = document.createElement('div');
+                catDiv.className = `col-span-4 rounded-xl p-4 flex flex-col items-center justify-center text-center pop shadow-sm ${cat.colorClass}`;
+                catDiv.innerHTML = `
+                    <div class="font-bold tracking-[0.2em] text-sm mb-1">${cat.title}</div>
+                    <div class="text-xs sm:text-sm tracking-widest opacity-90">${cat.words.join(', ')}</div>
+                `;
+                gridEl.appendChild(catDiv);
+            });
+
+            // 2. Render Unsolved Words
+            words.forEach((wordObj, index) => {
+                const card = document.createElement('div');
+                const isSelected = selectedWords.includes(wordObj.text);
+                
+                // Base classes
+                let classes = 'card rounded-xl border flex items-center justify-center text-center font-bold text-xs sm:text-sm md:text-base uppercase p-2 sm:p-4 h-16 sm:h-20 md:h-24 transition-all duration-200 ';
+                
+                if (isSelected) {
+                    classes += 'bg-fall-charcoal text-white border-fall-charcoal scale-95 shadow-inner';
+                } else {
+                    classes += 'bg-white text-fall-charcoal border-fall-sand hover:bg-fall-cream cursor-pointer shadow-sm';
+                }
+
+                card.className = classes;
+                card.textContent = wordObj.text;
+                card.dataset.word = wordObj.text;
+                
+                if (!isGameOver) {
+                    card.addEventListener('click', () => handleCardClick(wordObj.text, card));
+                }
+                
+                gridEl.appendChild(card);
+            });
+
+            updateControls();
+        }
+
+        // Card Click Handler
+        function handleCardClick(word, cardEl) {
+            if (selectedWords.includes(word)) {
+                // Deselect
+                selectedWords = selectedWords.filter(w => w !== word);
+            } else {
+                // Select (Max 4)
+                if (selectedWords.length < 4) {
+                    selectedWords.push(word);
+                }
+            }
+            renderBoard();
+        }
+
+        // Update Buttons State
+        function updateControls() {
+            const hasSelection = selectedWords.length > 0;
+            const isFullSelection = selectedWords.length === 4;
+
+            deselectBtn.disabled = !hasSelection;
+            submitBtn.disabled = !isFullSelection;
+
+            if (isGameOver) {
+                shuffleBtn.disabled = true;
+                deselectBtn.disabled = true;
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Show Toast Message
+        function showToast(message, isError = false) {
+            toastMessageEl.textContent = message;
+            
+            // Style based on type
+            if (isError) {
+                toastEl.classList.remove('bg-fall-charcoal');
+                toastEl.classList.add('bg-terracotta');
+            } else {
+                toastEl.classList.remove('bg-terracotta');
+                toastEl.classList.add('bg-fall-charcoal');
+            }
+
+            toastEl.classList.add('show');
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 2500);
+        }
+
+        // Submit Logic
+        function handleSubmit() {
+            if (selectedWords.length !== 4) return;
+
+            // Check if guess was already made
+            const guessKey = [...selectedWords].sort().join(',');
+            if (pastGuesses.includes(guessKey)) {
+                showToast("Already guessed!");
                 return;
             }
-            // Add full game validation logic here
-            document.getElementById('msg').textContent = "Group submitted! (Validation logic goes here)";
-            selected = [];
-            render();
+            pastGuesses.push(guessKey);
+
+            // Determine if the selected words map to exactly ONE category
+            const categoryCounts = {};
+            selectedWords.forEach(wordStr => {
+                const wordObj = words.find(w => w.text === wordStr);
+                categoryCounts[wordObj.categoryId] = (categoryCounts[wordObj.categoryId] || 0) + 1;
+            });
+
+            let matchedCategoryId = null;
+            let maxMatches = 0;
+            
+            for (const [catId, count] of Object.entries(categoryCounts)) {
+                if (count === 4) matchedCategoryId = catId;
+                if (count > maxMatches) maxMatches = count;
+            }
+
+            if (matchedCategoryId) {
+                // CORRECT GUESS
+                const matchedCategoryData = gameData.find(c => c.id === matchedCategoryId);
+                
+                // Add to solved
+                solvedCategories.push(matchedCategoryData);
+                
+                // Remove solved words from active words array
+                words = words.filter(w => !selectedWords.includes(w.text));
+                
+                selectedWords = [];
+                
+                showToast("Great! " + matchedCategoryData.title);
+
+                // Check Win
+                if (solvedCategories.length === 4) {
+                    isGameOver = true;
+                    setTimeout(() => showToast("Perfect! You found them all."), 1000);
+                }
+
+                renderBoard();
+
+            } else {
+                // INCORRECT GUESS
+                handleMistake(maxMatches === 3);
+            }
         }
 
-        shuffle();
+        function handleMistake(isOneAway) {
+            // Visual shake feedback on selected cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                if (selectedWords.includes(card.dataset.word)) {
+                    card.classList.add('shake');
+                    setTimeout(() => card.classList.remove('shake'), 400);
+                }
+            });
+
+            mistakes--;
+            updateMistakesDisplay();
+
+            if (mistakes === 0) {
+                isGameOver = true;
+                showToast("Better luck next time!", true);
+                revealAnswers();
+            } else {
+                if (isOneAway) {
+                    showToast("One away!", true);
+                } else {
+                    showToast("Not quite!", true);
+                }
+            }
+        }
+
+        function updateMistakesDisplay() {
+            mistakesEl.innerHTML = '';
+            for (let i = 0; i < mistakes; i++) {
+                mistakesEl.innerHTML += `<div class="w-3 h-3 rounded-full bg-terracotta"></div>`;
+            }
+            for (let i = mistakes; i < 4; i++) {
+                mistakesEl.innerHTML += `<div class="w-3 h-3 rounded-full bg-fall-sand"></div>`;
+            }
+        }
+
+        function revealAnswers() {
+            // Move all remaining categories to solved
+            const remainingCats = gameData.filter(cat => !solvedCategories.find(sc => sc.id === cat.id));
+            solvedCategories.push(...remainingCats);
+            words = [];
+            selectedWords = [];
+            renderBoard();
+        }
+
+        // Event Listeners
+        shuffleBtn.addEventListener('click', () => {
+            if (words.length > 0) {
+                shuffleArray(words);
+                renderBoard();
+            }
+        });
+
+        deselectBtn.addEventListener('click', () => {
+            selectedWords = [];
+            renderBoard();
+        });
+
+        submitBtn.addEventListener('click', handleSubmit);
+
+        // Start Game
+        initGame();
+
     </script>
 </body>
 </html>

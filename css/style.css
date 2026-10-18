@@ -1,23 +1,186 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap');
+
 :root {
     --terracotta: #e2725b;
     --terracotta-dark: #c85a46;
-    --cream: #f9f6f0;
+    --cream: #fbf9f6;
     --rust: #a0522d;
-    --text-dark: #4a4a4a;
+    --text-dark: #333333;
+    --text-light: #666666;
     --bg-color: #fdfbf7;
+    --border-color: #eae1d8;
 }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Lato', sans-serif; background-color: var(--bg-color); color: var(--text-dark); line-height: 1.6; }
-h1, h2, h3 { font-family: 'Playfair Display', serif; color: var(--rust); text-align: center; font-weight: 600; }
-header { text-align: center; padding: 3rem 1rem; background-color: var(--cream); border-bottom: 3px solid var(--terracotta); }
-.container { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; padding: 2rem 0; }
-.card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 2rem; text-align: center; text-decoration: none; color: inherit; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid var(--terracotta); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; }
-.card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(226, 114, 91, 0.15); }
-.card h2 { margin-bottom: 1rem; color: var(--terracotta-dark); }
-.btn { display: inline-block; background-color: var(--terracotta); color: white; padding: 0.8rem 1.5rem; text-decoration: none; border-radius: 30px; font-weight: bold; border: none; cursor: pointer; transition: background 0.3s; font-family: inherit; margin-top: 1rem; }
-.btn:hover { background-color: var(--terracotta-dark); }
-.nav-back { display: inline-block; margin-bottom: 2rem; color: var(--terracotta); text-decoration: none; font-weight: bold; }
-.nav-back:hover { text-decoration: underline; }
+
+body { 
+    font-family: 'Lato', sans-serif; 
+    background-color: var(--bg-color); 
+    color: var(--text-dark); 
+    line-height: 1.6; 
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { 
+    font-family: 'Playfair Display', serif; 
+    color: var(--rust); 
+    text-align: center; 
+    font-weight: 600; 
+}
+
+/* Header Styling */
+header { 
+    text-align: center; 
+    padding: 4rem 1rem 3rem; 
+    background-color: var(--cream); 
+    border-bottom: 1px solid var(--border-color); 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02); 
+}
+header h1 { 
+    font-size: 3.5rem; 
+    letter-spacing: 1px; 
+    color: var(--rust); 
+    margin-bottom: 0.5rem; 
+}
+.wedding-date { 
+    font-family: 'Playfair Display', serif; 
+    font-style: italic; 
+    font-size: 1.2rem; 
+    color: var(--terracotta); 
+    letter-spacing: 2px; 
+}
+.hub-title { 
+    margin-top: 1.5rem; 
+    font-size: 1rem; 
+    text-transform: uppercase; 
+    letter-spacing: 3px; 
+    color: var(--text-light); 
+    font-weight: 700;
+}
+
+/* Layout */
+.container { 
+    max-width: 1100px; 
+    margin: 0 auto; 
+    padding: 3rem 1.5rem; 
+}
+.grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 2.5rem; 
+}
+
+/* Card Styling */
+.card { 
+    background: #fff; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    padding: 3rem 2rem; 
+    text-align: center; 
+    text-decoration: none; 
+    color: inherit; 
+    transition: all 0.4s ease; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
+    position: relative; 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    min-height: 220px; 
+}
+.card::before { 
+    content: ''; 
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 100%; height: 4px; 
+    background: linear-gradient(90deg, var(--terracotta-dark), var(--terracotta)); 
+    opacity: 0; 
+    transition: opacity 0.4s ease; 
+}
+.card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 15px 40px rgba(226, 114, 91, 0.1); 
+    border-color: var(--terracotta); 
+}
+.card:hover::before { opacity: 1; }
+.card h2 { 
+    font-size: 1.8rem; 
+    margin-bottom: 1rem; 
+    color: var(--rust); 
+    transition: color 0.3s; 
+}
+.card p { 
+    color: var(--text-light); 
+    font-size: 1rem; 
+    line-height: 1.5; 
+}
+
+/* Buttons */
+.btn { 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--terracotta); 
+    color: #fff; 
+    padding: 0.8rem 2rem; 
+    text-decoration: none; 
+    border-radius: 4px; 
+    font-weight: 600; 
+    font-size: 0.9rem; 
+    letter-spacing: 1px; 
+    text-transform: uppercase; 
+    border: none; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    box-shadow: 0 4px 15px rgba(226, 114, 91, 0.2); 
+}
+.btn:hover { 
+    background-color: var(--terracotta-dark); 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 20px rgba(226, 114, 91, 0.3); 
+}
+.btn:active { transform: translateY(0); }
+.btn-outline { 
+    background: transparent; 
+    border: 2px solid var(--terracotta); 
+    color: var(--terracotta); 
+    box-shadow: none; 
+}
+.btn-outline:hover { 
+    background: var(--terracotta); 
+    color: white; 
+}
+
+/* Game Pages Shared */
+.nav-back { 
+    display: inline-flex; 
+    align-items: center; 
+    margin-bottom: 2.5rem; 
+    color: var(--terracotta); 
+    text-decoration: none; 
+    font-weight: 600; 
+    letter-spacing: 1px; 
+    font-size: 0.9rem; 
+    text-transform: uppercase; 
+    transition: color 0.3s; 
+}
+.nav-back:hover { color: var(--terracotta-dark); }
+.nav-back::before { 
+    content: '←'; 
+    margin-right: 8px; 
+    font-size: 1.2rem; 
+}
+.game-header { 
+    text-align: center; 
+    margin-bottom: 3rem; 
+}
+.game-header h1 { 
+    font-size: 2.8rem; 
+    margin-bottom: 0.5rem; 
+}
+.game-header p { 
+    color: var(--text-light); 
+    font-size: 1.1rem; 
+}
