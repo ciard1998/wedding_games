@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First Dance Sweepstakes</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .song-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem; }
+        .song-card { background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; text-align: center; border-left: 4px solid var(--terracotta); transition: all 0.2s; }
+        .song-card:hover, .song-card.selected { background-color: var(--cream); border-color: var(--terracotta); transform: scale(1.02); }
+        .song-title { font-weight: bold; color: var(--text-dark); display: block; margin-bottom: 0.3rem; }
+        .song-artist { font-size: 0.9em; color: #666; font-style: italic; }
+        .form-group { margin-top: 2rem; text-align: center; }
+        input[type="text"] { padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; margin-right: 1rem; width: 250px; }
+        #leaderboard { display: none; margin-top: 3rem; }
+        .bar-container { background-color: #eee; border-radius: 4px; margin: 0.5rem 0 1.5rem 0; height: 24px; width: 100%; overflow: hidden; }
+        .bar { background-color: var(--terracotta); height: 100%; width: 0%; transition: width 1s ease-in-out; }
+        .leader-row { text-align: left; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="nav-back">&larr; Back to Hub</a>
+        <h1>First Dance Sweepstakes</h1>
+        <p style="text-align:center; margin-top:1rem;">Select your guess for our first dance song!</p>
+
+        <div id="voting-section">
+            <div class="song-grid" id="song-list">
+                <!-- Javascript will populate this -->
+            </div>
+            <div class="form-group">
+                <input type="text" id="guest-name" placeholder="Your Name" required>
+                <button class="btn" onclick="submitVote()">Submit Guess</button>
+            </div>
+        </div>
+
+        <div id="leaderboard">
+            <h2>Live Leaderboard</h2>
+            <div id="leaderboard-content" style="margin-top: 2rem;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Replace with your actual Firebase config initialization here
+        const songs = [
+            "One Life - James Bay", "Not Even the King - Alicia Keys", "Say You Won't Let Go - James Arthur",
+            "Made for You - Jake Owen", "Lifetime - Justin Bieber", "In Case You Didn't Know - Brett Young",
+            "All Your'n - Tyler Childers", "Good Thing Go - Quinn XCII", "Wonderful Tonight - Eric Clapton",
+            "You Are the Best Thing - Ray LaMontagne", "Open Arms - Journey", "Back At One - Brian McKnight",
+            "Amazed - Lonestar", "I'll Be There (Acoustic) - Jess Glynne", "I Was Made for Loving You - Tori Kelly",
+            "Lover - Taylor Swift", "(I Do) Like We Do - Harry Connick Jr.", "Forever After All - Luke Combs",
+            "Marry Me - Train", "It Had to Be You - Frank Sinatra", "Better Together - Jack Johnson",
+            "I Don't Want to Miss a Thing - Aerosmith", "Lucky - Jason Mraz & Colbie Caillat",
+            "Perfect - Ed Sheeran", "Can’t Take My Eyes Off You - Frankie Valli"
+        ];
+
+        let selectedSong = "";
+        let mockVotes = {};
+
+        const songList = document.getElementById('song-list');
+        songs.forEach((song, index) => {
+            const [title, artist] = song.split(' - ');
+            const div = document.createElement('div');
+            div.className = 'song-card';
+            div.innerHTML = `<span class="song-title">${title}</span><span class="song-artist">${artist}</span>`;
+            div.onclick = () => {
+                document.querySelectorAll('.song-card').forEach(c => c.classList.remove('selected'));
+                div.classList.add('selected');
+                selectedSong = song;
+            };
+            songList.appendChild(div);
+            mockVotes[song] = Math.floor(Math.random() * 5); // Example mock data
+        });
+
+        function submitVote() {
+            const name = document.getElementById('guest-name').value;
+            if (!name || !selectedSong) return alert("Please enter your name and select a song!");
+            
+            // Connect this to your Firebase Firestore write
+            mockVotes[selectedSong]++;
+            
+            document.getElementById('voting-section').style.display = 'none';
+            document.getElementById('leaderboard').style.display = 'block';
+            renderLeaderboard();
+        }
+
+        function renderLeaderboard() {
+            const content = document.getElementById('leaderboard-content');
+            const sorted = Object.entries(mockVotes).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const maxVotes = sorted[0][1] || 1;
+
+            let html = '';
+            sorted.forEach(([song, votes]) => {
+                const percentage = (votes / maxVotes) * 100;
+                html += `
+                    <div class="leader-row">
+                        <strong>${song.split(' - ')[0]}</strong> (${votes} votes)
+                        <div class="bar-container">
+                            <div class="bar" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            content.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

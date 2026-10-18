@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Connections</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 2rem auto; max-width: 600px; }
+        .tile { background-color: #efefef; border-radius: 8px; padding: 1.5rem 0.5rem; text-align: center; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; user-select: none; transition: background-color 0.2s; }
+        .tile.selected { background-color: var(--text-dark); color: white; }
+        .controls { text-align: center; margin-top: 1rem; }
+        .message { text-align: center; margin: 1rem; font-weight: bold; color: var(--terracotta); min-height: 24px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="nav-back">&larr; Back to Hub</a>
+        <h1>Connections</h1>
+        <p style="text-align:center;">Create four groups of four!</p>
+        <div class="message" id="msg"></div>
+        <div class="board" id="board"></div>
+        <div class="controls">
+            <button class="btn" onclick="shuffle()">Shuffle</button>
+            <button class="btn" onclick="submit()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        const words = [
+            "AUCKLAND", "KAUAI", "MAUI", "SYDNEY", // Honeymoon
+            "OLD", "NEW", "BORROWED", "BLUE", // Wedding Tradition Traps
+            "TUFTS", "JUMBOS", "MEDFORD", "SOMERVILLE", // Alma Mater
+            "BRAVES", "ATLANTA", "TRUIST", "TOMAHAWK" // Baseball
+        ];
+        
+        let selected = [];
+        const board = document.getElementById('board');
+
+        function render() {
+            board.innerHTML = '';
+            words.forEach(word => {
+                const el = document.createElement('div');
+                el.className = 'tile' + (selected.includes(word) ? ' selected' : '');
+                el.textContent = word;
+                el.onclick = () => toggle(word);
+                board.appendChild(el);
+            });
+        }
+
+        function toggle(word) {
+            if (selected.includes(word)) {
+                selected = selected.filter(w => w !== word);
+            } else if (selected.length < 4) {
+                selected.push(word);
+            }
+            render();
+        }
+
+        function shuffle() {
+            for (let i = words.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [words[i], words[j]] = [words[j], words[i]];
+            }
+            render();
+        }
+
+        function submit() {
+            if (selected.length !== 4) {
+                document.getElementById('msg').textContent = "Select 4 items.";
+                setTimeout(() => document.getElementById('msg').textContent = "", 2000);
+                return;
+            }
+            // Add full game validation logic here
+            document.getElementById('msg').textContent = "Group submitted! (Validation logic goes here)";
+            selected = [];
+            render();
+        }
+
+        shuffle();
+    </script>
+</body>
+</html>

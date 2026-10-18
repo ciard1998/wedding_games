@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Wordle</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .wordle-grid { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; width: fit-content; margin: 2rem auto; }
+        .wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+        .wordle-cell { width: 50px; height: 50px; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="nav-back">&larr; Back to Hub</a>
+        <h1>Wordle</h1>
+        <p style="text-align:center;">Good vibes and energy themes!</p>
+        <div class="wordle-grid" id="grid"></div>
+        <p style="text-align:center; margin-top:2rem; color:#666;">(Keyboard and core Wordle guess logic goes here)</p>
+    </div>
+    <script>
+        const grid = document.getElementById('grid');
+        for(let i=0; i<6; i++) {
+            const row = document.createElement('div');
+            row.className = 'wordle-row';
+            for(let j=0; j<5; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'wordle-cell';
+                row.appendChild(cell);
+            }
+            grid.appendChild(row);
+        }
+        // e.g. targetWord = "VIBES";
+    </script>
+</body>
+</html>
