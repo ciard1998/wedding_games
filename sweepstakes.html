@@ -437,5 +437,32 @@
 
         init();
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deadline = new Date('2026-10-30T18:00:00');
+            if (new Date() > deadline) {
+                // Disable voting form
+                const form = document.querySelector('form');
+                if (form) {
+                    Array.from(form.elements).forEach(el => el.disabled = true);
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.textContent = 'Voting Closed';
+                        submitBtn.className = 'w-full py-4 rounded-xl bg-gray-300 text-gray-600 font-bold uppercase tracking-wider text-xs cursor-not-allowed';
+                    }
+                }
+                // Show closed notice banner
+                const notice = document.createElement('div');
+                notice.className = 'bg-fall-cream border border-terracotta/30 p-4 rounded-2xl text-center text-xs font-serif text-fall-charcoal mb-6';
+                notice.innerHTML = '✨ <strong>Voting is now closed!</strong> Thank you for participating in Ryan & Erica’s first dance sweepstakes. Enjoy the rest of the celebration!';
+                const mainContainer = document.querySelector('main');
+                if (mainContainer) {
+                    mainContainer.insertBefore(notice, mainContainer.firstChild);
+                }
+            }
+        });
+    </script>
 </body>
+
 </html>
