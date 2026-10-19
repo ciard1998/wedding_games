@@ -130,6 +130,7 @@
                     <!-- Leaderboard rows injected by JS -->
                 </div>
 
+                
                 <!-- Change Vote Button Container -->
                 <div id="change-vote-container" class="text-center pt-4 border-t border-fall-sand hidden">
                     <button id="changeVoteBtn" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-terracotta hover:text-terracotta-dark transition-colors underline underline-offset-4">
@@ -137,6 +138,14 @@
                     </button>
                     <p class="text-[11px] text-gray-400 mt-1">Changes allowed until October 30, 2026 at 6:00 PM</p>
                 </div>
+                
+                <!-- Back to Reveal Button (Shows after 6:30 PM) -->
+                <div id="back-to-reveal-container" class="text-center pt-4 border-t border-fall-sand hidden">
+                    <button id="backToRevealBtn" class="px-6 py-2 rounded-full border border-terracotta text-terracotta font-bold uppercase tracking-wider text-xs hover:bg-terracotta hover:text-white transition-colors shadow-sm">
+                        Back to the Reveal
+                    </button>
+                </div>
+
             </div>
             
             <div class="text-center mt-8">
@@ -144,6 +153,42 @@
             </div>
         </div>
 
+
+        <!-- View 3: The Big Reveal (Shows after 6:30 PM) -->
+        <div id="reveal-view" class="w-full max-w-3xl hidden animate-fade-in text-center mt-8">
+            <div class="inline-block px-4 py-1 mb-6 border border-terracotta rounded-full bg-terracotta/10">
+                <p class="text-xs sm:text-sm uppercase tracking-[0.3em] text-terracotta-dark font-bold">The Secret Is Out!</p>
+            </div>
+            
+            <h2 class="text-3xl sm:text-4xl font-serif font-bold text-fall-charcoal mb-4">Our First Dance</h2>
+            
+            <div class="bg-white rounded-3xl p-8 sm:p-12 border-2 border-terracotta shadow-xl my-8 relative overflow-hidden">
+                <div class="absolute -top-6 -left-6 text-fall-cream opacity-50 transform -rotate-12">
+                    <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                <div class="absolute -bottom-6 -right-6 text-fall-cream opacity-50 transform rotate-12">
+                    <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+                
+                <div class="relative z-10 flex flex-col items-center">
+                    <div class="w-20 h-20 bg-terracotta rounded-full flex items-center justify-center text-white mb-6 shadow-md">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-4xl sm:text-5xl font-serif font-bold text-fall-charcoal mb-2">One Life</h3>
+                    <p class="text-lg sm:text-xl text-gray-500 uppercase tracking-widest font-bold">James Bay</p>
+                </div>
+            </div>
+
+            <p class="text-gray-600 font-sans max-w-xl mx-auto mb-8" id="reveal-user-result">
+                Checking your guess...
+            </p>
+            
+            <button id="viewResultsBtn" class="px-8 py-3 rounded-full border-2 border-terracotta text-terracotta font-bold uppercase tracking-wider text-xs hover:bg-terracotta hover:text-white transition-colors">
+                View Final Leaderboard
+            </button>
+        </div>
     </main>
 
     <script>
@@ -177,6 +222,57 @@
 
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXRyQl0t0dBYqknA7IuyzmrV9uJzOfxgRatASyE1B-saHyM6BkUPjK-6Gdf8LJyVOLVg/exec";
         const CUTOFF_DATE = new Date("2026-10-30T18:00:00");
+
+        const REVEAL_DATE = new Date("2026-10-30T18:30:00");
+
+        let revealTriggered = false;
+        function checkRevealTime() {
+            const now = new Date();
+            
+            // Handle Voting Closed state
+            if (now >= CUTOFF_DATE && now < REVEAL_DATE) {
+                const changeVoteBtn = document.getElementById('change-vote-container');
+                if (changeVoteBtn) changeVoteBtn.classList.add('hidden');
+            }
+            
+            // Handle Reveal state
+            if (now >= REVEAL_DATE) {
+                const backToRevealContainer = document.getElementById('back-to-reveal-container');
+                if(backToRevealContainer) backToRevealContainer.classList.remove('hidden');
+
+                if (!revealTriggered) {
+                    revealTriggered = true;
+                    const votingView = document.getElementById('voting-view');
+                    const leaderboardView = document.getElementById('leaderboard-view');
+                    const revealView = document.getElementById('reveal-view');
+                    
+                    if(votingView) votingView.classList.add('hidden');
+                    if(leaderboardView) leaderboardView.classList.add('hidden');
+                    if(revealView) revealView.classList.remove('hidden');
+                    
+                    const subtitle = document.getElementById('subtitle');
+                    if(subtitle) subtitle.textContent = "The results are in!";
+                    
+                    const userGuessEl = document.getElementById('reveal-user-result');
+                    if (userGuessEl) {
+                        if (selectedSongId === 1) {
+                            userGuessEl.innerHTML = '<strong>Congratulations!</strong> You guessed it correctly. Meet us on the dance floor!';
+                            userGuessEl.className = 'text-[#6aaa64] font-sans max-w-xl mx-auto mb-8 text-lg';
+                        } else if (selectedSongId) {
+                            userGuessEl.innerHTML = 'You guessed differently, but we hope you love this song just as much!';
+                            userGuessEl.className = 'text-gray-500 font-sans max-w-xl mx-auto mb-8';
+                        } else {
+                            userGuessEl.innerHTML = 'The votes are locked in. Meet us on the dance floor!';
+                            userGuessEl.className = 'text-gray-500 font-sans max-w-xl mx-auto mb-8';
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check every second so it updates live if they are staring at the screen
+        setInterval(checkRevealTime, 1000);
+
 
         let selectedSongId = null;
         let hasVoted = false;
@@ -435,30 +531,53 @@
             });
         }
 
+        
+
+        const viewResultsBtn = document.getElementById('viewResultsBtn');
+        if (viewResultsBtn) {
+            viewResultsBtn.addEventListener('click', () => {
+                document.getElementById('reveal-view').classList.add('hidden');
+                document.getElementById('leaderboard-view').classList.remove('hidden');
+                document.getElementById('change-vote-container').classList.add('hidden');
+            });
+        }
+        
+        const backToRevealBtn = document.getElementById('backToRevealBtn');
+        if (backToRevealBtn) {
+            backToRevealBtn.addEventListener('click', () => {
+                document.getElementById('leaderboard-view').classList.add('hidden');
+                document.getElementById('reveal-view').classList.remove('hidden');
+            });
+        }
+
+
         init();
     </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const deadline = new Date('2026-10-30T18:00:00');
-            if (new Date() > deadline) {
+            const now = new Date();
+            if (now > CUTOFF_DATE) {
+                if (now >= REVEAL_DATE) return; // Skip banner if reveal is active
+
                 // Disable voting form
-                const form = document.querySelector('form');
-                if (form) {
-                    Array.from(form.elements).forEach(el => el.disabled = true);
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    if (submitBtn) {
-                        submitBtn.textContent = 'Voting Closed';
-                        submitBtn.className = 'w-full py-4 rounded-xl bg-gray-300 text-gray-600 font-bold uppercase tracking-wider text-xs cursor-not-allowed';
-                    }
+                const guestNameInput = document.getElementById('guestName');
+                if (guestNameInput) guestNameInput.disabled = true;
+                
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                    submitBtn.textContent = 'Voting Closed';
+                    submitBtn.className = 'px-10 py-4 rounded-full bg-gray-300 text-gray-600 font-bold uppercase tracking-wider text-sm cursor-not-allowed shadow-sm w-full sm:w-auto';
+                    submitBtn.disabled = true;
                 }
+                
                 // Show closed notice banner
                 const notice = document.createElement('div');
-                notice.className = 'bg-fall-cream border border-terracotta/30 p-4 rounded-2xl text-center text-xs font-serif text-fall-charcoal mb-6';
-                notice.innerHTML = '✨ <strong>Voting is now closed!</strong> Thank you for participating in Ryan & Erica’s first dance sweepstakes. Enjoy the rest of the celebration!';
-                const mainContainer = document.querySelector('main');
-                if (mainContainer) {
-                    mainContainer.insertBefore(notice, mainContainer.firstChild);
+                notice.className = 'bg-fall-cream border border-terracotta/30 p-4 rounded-2xl text-center text-xs font-serif text-fall-charcoal mb-6 w-full max-w-md animate-fade-in';
+                notice.innerHTML = '✨ <strong>Voting is now closed!</strong> Thank you for participating. Enjoy the rest of the celebration!';
+                const votingView = document.getElementById('voting-view');
+                if (votingView) {
+                    votingView.insertBefore(notice, votingView.firstChild);
                 }
             }
         });

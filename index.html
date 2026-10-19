@@ -48,7 +48,7 @@
             <p class="text-xs sm:text-sm uppercase tracking-[0.3em] text-terracotta-dark font-bold">October 30, 2026</p>
         </div>
         <h1 class="text-5xl sm:text-6xl md:text-7xl font-serif text-fall-charcoal mb-6 tracking-tight font-semibold">Ryan & Erica</h1>
-        <h2 class="text-2xl sm:text-3xl font-serif italic text-gray-600 mb-8">Digital Wedding Games Hub</h2>
+        <h2 class="text-2xl sm:text-3xl font-serif italic text-gray-600 mb-8">Wedding Games Hub</h2>
         
         <div class="flex items-center justify-center max-w-xs mx-auto">
             <div class="h-[1px] bg-fall-sand flex-1"></div>
@@ -59,7 +59,7 @@
         </div>
         
         <p class="mt-8 text-lg sm:text-xl text-gray-600 font-sans max-w-2xl mx-auto leading-relaxed">
-            Welcome to our interactive celebration! Join the fun, test your knowledge, and cast your guesses as we count down to our special day.
+            Welcome to our wedding day! To add a little extra fun to the celebration, we’ve recreated some of our favorite daily games. Jump in, cast your guesses, and help us capture the memories.
         </p>
     </header>
 
@@ -199,15 +199,28 @@
 
 
     <script>
-        // Check if October 30, 2026 at 6:00 PM has passed
-        const deadline = new Date('2026-10-30T18:00:00');
-        if (new Date() > deadline) {
+        function updateSweepstakesBadge() {
+            const now = new Date();
+            const closeDeadline = new Date('2026-10-30T18:00:00');
+            const revealDeadline = new Date('2026-10-30T18:30:00');
             const badge = document.getElementById('sweepstakes-badge');
-            if (badge) {
+            
+            if (!badge) return;
+
+            if (now >= revealDeadline) {
+                badge.textContent = 'Results';
+                badge.className = 'bg-fall-charcoal text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-bold shadow-sm';
+            } else if (now >= closeDeadline) {
                 badge.textContent = 'Closed';
                 badge.className = 'bg-gray-100 text-gray-500 text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-bold';
+            } else {
+                badge.textContent = 'Live';
+                badge.className = 'bg-terracotta/10 text-terracotta-dark text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-bold';
             }
         }
+        
+        updateSweepstakesBadge();
+        setInterval(updateSweepstakesBadge, 5000); // Check every 5 seconds so it updates automatically
     </script>
 </body>
 
