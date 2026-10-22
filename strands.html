@@ -112,7 +112,7 @@
     <!-- Header -->
     <header class="text-center w-full max-w-2xl mx-auto mb-4">
         <h1 class="text-3xl sm:text-4xl font-serif text-fall-charcoal mb-1 font-semibold">Wedding Strands</h1>
-        <p class="text-gray-600 font-sans text-sm italic" id="theme-clue">Theme: "Insomnia"</p>
+        <p class="text-gray-600 font-sans text-sm italic" id="theme-clue">Theme: "An Insomniac's Haven"</p>
         <div class="h-[1px] w-12 bg-terracotta mx-auto mt-2"></div>
     </header>
 
@@ -138,51 +138,40 @@
             <!-- Grid cells injected by JS -->
         </div>
 
-        <!-- Controls -->
-        <div class="flex gap-3 w-full max-w-xs">
-            <button id="clearBtn" class="flex-1 py-3 rounded-full border border-terracotta text-terracotta font-bold uppercase tracking-wider text-xs hover:bg-fall-cream transition-colors">
-                Clear Selection
-            </button>
-            <button id="submitBtn" class="flex-1 py-3 rounded-full bg-terracotta text-white font-bold uppercase tracking-wider text-xs hover:bg-terracotta-dark transition-colors shadow-md">
-                Submit Word
-            </button>
-        </div>
-
     </main>
 
     <script>
-        // Exactly 6 columns by 8 rows grid (48 letters total)
+        // Completely rebuilt grid to enforce single unique paths for all words
         const GRID_LETTERS = [
-            ['T', 'H', 'E', 'B', 'I', 'G'],
-            ['E', 'L', 'P', 'P', 'A', 'B'],
-            ['W', 'D', 'A', 'O', 'R', 'S'],
-            ['A', 'Y', 'W', 'B', 'U', 'E'],
-            ['Y', 'A', 'I', 'P', 'M', 'B'],
-            ['E', 'R', 'E', 'G', 'A', 'P'],
-            ['M', 'L', 'Z', 'Z', 'I', 'T'],
-            ['E', 'T', 'A', 'I', 'X', 'A']
+            ['N', 'Y', 'A', 'T', 'N', 'I'],
+            ['B', 'O', 'T', 'H', 'G', 'P'],
+            ['D', 'E', 'G', 'A', 'I', 'Z'],
+            ['S', 'U', 'B', 'A', 'Z', 'D'],
+            ['A', 'W', 'E', 'N', 'I', 'S'],
+            ['Y', 'R', 'R', 'L', 'I', 'T'],
+            ['E', 'S', 'A', 'B', 'G', 'H'],
+            ['N', 'I', 'L', 'Y', 'K', 'S']
         ];
 
-        const VALID_WORDS = {
-            "THEBIGAPPLE": { type: "spangram", display: "THE BIG APPLE" },
-            "BROADWAY": { type: "word", display: "BROADWAY" },
-            "SUBWAY": { type: "word", display: "SUBWAY" },
-            "EMPIRE": { type: "word", display: "EMPIRE" },
-            "BAGEL": { type: "word", display: "BAGEL" },
-            "PIZZA": { type: "word", display: "PIZZA" },
-            "TAXI": { type: "word", display: "TAXI" },
-            "MET": { type: "word", display: "MET" }
-        };
+        const VALID_WORDS = [
+            { word: "NYATNIGHT", type: "spangram", display: "NY AT NIGHT", path: ["0,0", "0,1", "0,2", "0,3", "0,4", "0,5", "1,4", "1,3", "1,2"] },
+            { word: "BODEGA", type: "word", display: "BODEGA", path: ["1,0", "1,1", "2,0", "2,1", "2,2", "2,3"] },
+            { word: "PIZZA", type: "word", display: "PIZZA", path: ["1,5", "2,4", "2,5", "3,4", "3,3"] },
+            { word: "SUBWAY", type: "word", display: "SUBWAY", path: ["3,0", "3,1", "3,2", "4,1", "4,0", "5,0"] },
+            { word: "DINER", type: "word", display: "DINER", path: ["3,5", "4,4", "4,3", "4,2", "5,1"] },
+            { word: "LIGHTS", type: "word", display: "LIGHTS", path: ["5,3", "5,4", "6,4", "6,5", "5,5", "4,5"] },
+            { word: "BARS", type: "word", display: "BARS", path: ["6,3", "6,2", "5,2", "6,1"] },
+            { word: "SKYLINE", type: "word", display: "SKYLINE", path: ["7,5", "7,4", "7,3", "7,2", "7,1", "7,0", "6,0"] }
+        ];
 
         let selectedCells = [];
         let foundWords = [];
         let foundCellCoords = new Set();
         let isDragging = false;
+        let hasDragged = false;
 
         const gridEl = document.getElementById('grid');
         const foundWordsEl = document.getElementById('found-words');
-        const submitBtn = document.getElementById('submitBtn');
-        const clearBtn = document.getElementById('clearBtn');
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toastMessage');
 
@@ -199,9 +188,19 @@
                 }
             }
 
+            // Grid event listeners
             gridEl.addEventListener('pointerdown', handlePointerDown);
             window.addEventListener('pointermove', handlePointerMove);
             window.addEventListener('pointerup', handlePointerUp);
+            
+            // Clear selection if tapping away from the board
+            window.addEventListener('pointerdown', (e) => {
+                const el = document.elementFromPoint(e.clientX, e.clientY);
+                if (!el || (!el.classList.contains('letter-cell') && !e.target.closest('nav') && !e.target.closest('#toast'))) {
+                    selectedCells = [];
+                    updateSelectionUI();
+                }
+            });
         }
 
         function getCellFromPoint(clientX, clientY) {
@@ -216,6 +215,36 @@
             return null;
         }
 
+        function checkAndSubmit() {
+            if (selectedCells.length < 4) return false;
+
+            const selectedPath = selectedCells.map(i => `${i.r},${i.c}`).join('|');
+            const selectedPathReversed = [...selectedCells].reverse().map(i => `${i.r},${i.c}`).join('|');
+            
+            const foundWordInfo = VALID_WORDS.find(w => {
+                const wPath = w.path.join('|');
+                return (wPath === selectedPath || wPath === selectedPathReversed);
+            });
+
+            if (foundWordInfo && !foundWords.includes(foundWordInfo.word)) {
+                foundWords.push(foundWordInfo.word);
+                
+                selectedCells.forEach(item => {
+                    const coordKey = `${item.r},${item.c}`;
+                    foundCellCoords.add(coordKey);
+                    const cell = document.querySelector(`[data-row="${item.r}"][data-col="${item.c}"]`);
+                    cell.classList.remove('selected');
+                    cell.classList.add(foundWordInfo.type === 'spangram' ? 'spangram' : 'found');
+                });
+
+                showToast(foundWordInfo.type === 'spangram' ? `Spangram Found: ${foundWordInfo.display}! ⭐` : `Found: ${foundWordInfo.display}! 🎉`);
+                renderFoundWords();
+                selectedCells = [];
+                return true;
+            }
+            return false;
+        }
+
         function handlePointerDown(e) {
             const targetInfo = getCellFromPoint(e.clientX, e.clientY);
             if (!targetInfo) return;
@@ -223,9 +252,44 @@
             const { r, c, cellEl } = targetInfo;
             if (cellEl.classList.contains('found') || cellEl.classList.contains('spangram')) return;
 
-            isDragging = true;
+            if (selectedCells.length > 0) {
+                const last = selectedCells[selectedCells.length - 1];
+                const rowDiff = Math.abs(last.r - r);
+                const colDiff = Math.abs(last.c - c);
+
+                if (rowDiff === 0 && colDiff === 0) {
+                    // Double-tap triggered on the final letter
+                    if (!checkAndSubmit()) {
+                        selectedCells = [];
+                        updateSelectionUI();
+                        showToast("Not a theme word!");
+                    }
+                    isDragging = false; 
+                    return;
+                }
+
+                // Standard manual tap chaining
+                if (rowDiff <= 1 && colDiff <= 1 && !selectedCells.some(item => item.r === r && item.c === c)) {
+                    selectedCells.push({ r, c, letter: GRID_LETTERS[r][c] });
+                    updateSelectionUI();
+                    isDragging = true;
+                    hasDragged = false;
+                    return;
+                }
+                
+                // If they tapped far away, restart selection
+                selectedCells = [{ r, c, letter: GRID_LETTERS[r][c] }];
+                updateSelectionUI();
+                isDragging = true;
+                hasDragged = false;
+                return;
+            }
+
+            // Fresh start
             selectedCells = [{ r, c, letter: GRID_LETTERS[r][c] }];
             updateSelectionUI();
+            isDragging = true;
+            hasDragged = false;
         }
 
         function handlePointerMove(e) {
@@ -237,29 +301,40 @@
             const { r, c, cellEl } = targetInfo;
             if (cellEl.classList.contains('found') || cellEl.classList.contains('spangram')) return;
 
-            // Allow backtracking
             const existingIndex = selectedCells.findIndex(item => item.r === r && item.c === c);
             if (existingIndex !== -1) {
-                selectedCells = selectedCells.slice(0, existingIndex + 1);
-                updateSelectionUI();
+                if (existingIndex < selectedCells.length - 1) {
+                    selectedCells = selectedCells.slice(0, existingIndex + 1);
+                    updateSelectionUI();
+                    hasDragged = true;
+                }
                 return;
             }
 
-            // Check adjacency to last selected cell
             const last = selectedCells[selectedCells.length - 1];
             const rowDiff = Math.abs(last.r - r);
             const colDiff = Math.abs(last.c - c);
 
             if (rowDiff <= 1 && colDiff <= 1) {
-                if (!selectedCells.some(item => item.r === r && item.c === c)) {
-                    selectedCells.push({ r, c, letter: GRID_LETTERS[r][c] });
-                    updateSelectionUI();
-                }
+                selectedCells.push({ r, c, letter: GRID_LETTERS[r][c] });
+                updateSelectionUI();
+                hasDragged = true;
             }
         }
 
         function handlePointerUp() {
+            if (!isDragging) return;
             isDragging = false;
+            
+            // Only submit on lift if the user actively dragged through multiple letters
+            if (hasDragged) {
+                if (!checkAndSubmit()) {
+                    selectedCells = [];
+                    updateSelectionUI();
+                    showToast("Not a theme word!");
+                }
+                hasDragged = false;
+            }
         }
 
         function updateSelectionUI() {
@@ -287,39 +362,6 @@
             }, duration);
         }
 
-        clearBtn.addEventListener('click', () => {
-            selectedCells = [];
-            updateSelectionUI();
-        });
-
-        submitBtn.addEventListener('click', () => {
-            if (selectedCells.length === 0) return;
-
-            const wordStr = selectedCells.map(i => i.letter).join('');
-
-            if (VALID_WORDS[wordStr] && !foundWords.includes(wordStr)) {
-                foundWords.push(wordStr);
-                const info = VALID_WORDS[wordStr];
-                
-                selectedCells.forEach(item => {
-                    const coordKey = `${item.r},${item.c}`;
-                    foundCellCoords.add(coordKey);
-                    const cell = document.querySelector(`[data-row="${item.r}"][data-col="${item.c}"]`);
-                    cell.classList.remove('selected');
-                    cell.classList.add(info.type === 'spangram' ? 'spangram' : 'found');
-                });
-
-                showToast(info.type === 'spangram' ? `Spangram Found: ${info.display}! ⭐` : `Found: ${info.display}! 🎉`);
-                renderFoundWords();
-                selectedCells = [];
-
-            } else {
-                showToast("Not a valid theme word. Try again!");
-                selectedCells = [];
-                updateSelectionUI();
-            }
-        });
-
         function renderFoundWords() {
             if (foundWords.length === 0) {
                 foundWordsEl.innerHTML = '<span class="text-sm italic text-gray-400">None yet. Drag across adjacent letters!</span>';
@@ -327,9 +369,9 @@
             }
 
             foundWordsEl.innerHTML = '';
-            foundWords.forEach(w => {
+            foundWords.forEach(wordKey => {
                 const badge = document.createElement('span');
-                const info = VALID_WORDS[w];
+                const info = VALID_WORDS.find(w => w.word === wordKey);
                 badge.className = `px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${info.type === 'spangram' ? 'bg-fall-charcoal text-white' : 'bg-terracotta text-white'}`;
                 badge.textContent = info.display;
                 foundWordsEl.appendChild(badge);
